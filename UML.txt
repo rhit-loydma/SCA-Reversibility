@@ -16,22 +16,22 @@ class Cell {
 Class Row {
 - Cell[] cells
 + getSucessor()
-+ getPosibblePredecessors()
++ getPossiblePredecessors()
 + findTwins()
 + toString()
 }
 
 enum CrossingStatus {
-NoCross
-LeftTop
-RightTop
+NO
+LEFT
+RIGHT
 }
 hide CrossingStatus methods
 
 enum TurningStatus {
-No
-Upright
-Slanted
+NO
+UPRIGHT
+SLANTED
 }
 hide TurningStatus methods
 
@@ -64,14 +64,14 @@ class TwinsFinder {
 - int TurningRule
 + findTwins(String row)
 + findTwins(int width)
-+ findTwins(int start, int end)
++ findTwinsUpTo(int width)
 }
 
 class GardenOfEdenFinder {
 - int CrossingRule
 - int TurningRule
 + findStates(int width)
-+ findStates(int start, int end)
++ findStatesUpTo(int wifth)
 + isGoE(String row)
 }
 
@@ -94,7 +94,6 @@ Cell --> CrossingStatus
 Cell --> TurningStatus
 ReversibleChecker --> Node
 
-ReversibleChecker --> Row
 TwinsFinder --> Row
 GardenOfEdenFinder --> Row
 Generator --> Row
