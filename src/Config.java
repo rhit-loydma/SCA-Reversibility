@@ -4,6 +4,11 @@ import java.util.Properties;
 
 public class Config {
     Properties prop;
+
+    /**
+     * Class constructor
+     * @param configFile file path of the .properties file
+     */
     public Config(String configFile) {
         try {
             FileReader file = new FileReader(configFile);
@@ -75,7 +80,14 @@ public class Config {
         return 0;
     }
 
-    //validates string input against an array of possible values
+    /**
+     * Validates string input against an array of possible values
+     * Stops the program if a bad value is inserted
+     * @param param the parameter being validated
+     * @param input the user input from the .properties file
+     * @param vals the array of "good" values for the parameter
+     * @return the input
+     */
     private String validateParam(String param, String input, String[] vals) {
         for(String v : vals) {
             if(input.equals(v)){

@@ -6,6 +6,10 @@ public class CrossingRule {
     HashMap<CrossingStatus, Integer> leftMap;
     HashMap<CrossingStatus, Integer> rightMap;
 
+    /**
+     * Class constructor
+     * @param rule the decimal representation of the rule
+     */
     public CrossingRule(int rule) {
         this.rule = rule;
         String b = Integer.toBinaryString(rule);
@@ -31,9 +35,16 @@ public class CrossingRule {
         rightMap.put(CrossingStatus.RIGHT, 2);
     }
 
+    /**
+     * Using a neighborhood, calculate the next iteration's crossing status
+     * @param left the left cell in the neighborhood
+     * @param right the right cell in the neighborhood
+     * @return the CrossingStatus of a cell in the next iteration
+     */
     public CrossingStatus getStatus(Cell left, Cell right) {
         int l = this.leftMap.get(left.crossingStatus);
         int r = this.rightMap.get(right.crossingStatus);
+        //row-major order
         int index = 3 * l + r;
         return this.arr[index];
     }

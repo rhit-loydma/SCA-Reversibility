@@ -5,6 +5,10 @@ public class TurningRule {
     TurningStatus[] arr;
     HashMap<TurningStatus, Integer> map;
 
+    /**
+     * Class constructor
+     * @param rule the decimal representation of the rule
+     */
     public TurningRule(int rule) {
         this.rule = rule;
         String b = Integer.toBinaryString(rule);
@@ -25,6 +29,12 @@ public class TurningRule {
         map.put(TurningStatus.SLANTED, 2);
     }
 
+    /**
+     * Using a neighborhood, calculate the next iteration's turning status
+     * @param left the left cell in the neighborhood
+     * @param right the right cell in the neighborhood
+     * @return the TurningStatus of a cell in the next iteration
+     */
     public TurningStatus getStatus(Cell left, Cell right) {
         int l;
         if (left.left == TurningStatus.SLANTED) {
@@ -44,6 +54,7 @@ public class TurningRule {
             r = this.map.get(TurningStatus.NO);
         }
 
+        //row-major order
         int index = 3 * l + r;
         return this.arr[index];
     }
