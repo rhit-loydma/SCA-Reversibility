@@ -6,14 +6,14 @@ public class Row {
     TurningRule tRule;
     Boolean parity;
 
-    public Row(String rep, CrossingRule cRule, TurningRule tRule, boolean parity) {
+    public Row(String rep, int cRule, int tRule, boolean parity) {
         String[] cs = rep.split(" ");
         this.cells = new Cell[cs.length];
         for (int i = 0; i < cs.length; i++) {
             this.cells[i] = new Cell(cs[i]);
         }
-        this.cRule = cRule;
-        this.tRule = tRule;
+        this.cRule = new CrossingRule(cRule);
+        this.tRule = new TurningRule(tRule);
         this.parity = parity;
     }
 
@@ -38,7 +38,7 @@ public class Row {
         if (parity) {
             s.append("  ");
         }
-        s.append("-----".repeat(this.cells.length - 1) + "\n");
+        s.append("-----".repeat(this.cells.length - 1));
         return s.toString();
     }
 
