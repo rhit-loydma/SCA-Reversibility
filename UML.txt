@@ -1,0 +1,103 @@
+@startuml
+class Application {
++ main()
+}
+
+class ConfigParser {
+- propertiesFile
++ getParam()
+- validateParam()
+}
+
+class Cell {
++ toString()
+}
+
+Class Row {
+- Cell[] cells
++ getSucessor()
++ getPosibblePredecessors()
++ findTwins()
++ toString()
+}
+
+enum CrossingStatus {
+NoCross
+LeftTop
+RightTop
+}
+hide CrossingStatus methods
+
+enum TurningStatus {
+No
+Upright
+Slanted
+}
+hide TurningStatus methods
+
+class CrossingRule {
+- int rule
++ getStatus(Cell[] neighbors)
+}
+
+class TurningRule {
+- int rule
++ getStatus(Cell[] neighbors)
+}
+
+class ReversibleChecker {
+- int CrossingRule
+- int TurningRule
++ createdNodes
++ checkReversible()
+}
+
+class Node {
+- neighborhoods
+- isTerminal
+- isExtended
++ childNodes()
+}
+
+class TwinsFinder {
+- int CrossingRule
+- int TurningRule
++ findTwins(String row)
++ findTwins(int width)
++ findTwins(int start, int end)
+}
+
+class GardenOfEdenFinder {
+- int CrossingRule
+- int TurningRule
++ findStates(int width)
++ findStates(int start, int end)
++ isGoE(String row)
+}
+
+class Generator {
+- int CrossingRule
+- int TurningRule
++ generatePattern(String start, int height)
+}
+
+Application --> ConfigParser
+Application --> ReversibleChecker
+Application --> TwinsFinder
+Application --> GardenOfEdenFinder
+Application --> Generator
+TwinsFinder --> ReversibleChecker
+GardenOfEdenFinder --> ReversibleChecker
+
+Row --> Cell
+Cell --> CrossingStatus
+Cell --> TurningStatus
+ReversibleChecker --> Node
+
+ReversibleChecker --> Row
+TwinsFinder --> Row
+GardenOfEdenFinder --> Row
+Generator --> Row
+Row --> CrossingRule
+Row --> TurningRule
+@enduml
