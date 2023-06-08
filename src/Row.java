@@ -53,11 +53,11 @@ public class Row {
             s.append(THREAD + c.toString());
             s.append(GRID + "|");
         }
-        s.append("\n");
-        if (parity) {
+        //s.append("\n");
+        if (!parity) {
             s.append("  ");
         }
-        s.append("-----".repeat(this.cells.length - 1));
+        //s.append("-----".repeat(this.cells.length - 1));
         return s.toString();
     }
 

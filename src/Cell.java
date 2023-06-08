@@ -33,7 +33,7 @@ public class Cell {
 
     /**
      * Creates a cell based off crossing and turning statuses
-     * Used for iterations in a SCA
+     * Used for iterations in an SCA
      * @param crossingStatus
      * @param left
      * @param right
