@@ -8,22 +8,17 @@ public class WolframNode {
     WolframNode left;
     WolframNode right;
     boolean frontier;
-    HashMap<String, Integer> rule;
 
     public WolframNode(HashMap<String, Integer> rule) {
         this.b=-1;
-        this.rule = rule;
         this.neighborhoods = rule.keySet();
-        if(!this.neighborhoods.isEmpty()) {
-            WolframTree.Container<Set<String>> prev = new WolframTree.Container<>();
-            this.left = new WolframNode(0, this.neighborhoods, this.rule, prev);
-            this.right = new WolframNode(1, this.neighborhoods, this.rule, prev);
-        }
+        Container<Set<String>> prev = new Container<>();
+        this.left = new WolframNode(0, this.neighborhoods, rule, prev);
+        this.right = new WolframNode(1, this.neighborhoods, rule, prev);
     }
 
-    public WolframNode(int b, Set<String> neighborhoods, HashMap<String, Integer> rule, WolframTree.Container<Set<String>> prev) {
+    public WolframNode(int b, Set<String> neighborhoods, HashMap<String, Integer> rule, Container<Set<String>> prev) {
         this.b = b;
-        this.rule = rule;
 
         //find this node's neighborhoods list based on b value
         this.neighborhoods = new HashSet<>();
@@ -45,8 +40,8 @@ public class WolframNode {
 
         if (!this.neighborhoods.isEmpty() && !this.frontier) {
             prev.add(this.neighborhoods);
-            this.left = new WolframNode(0, this.neighborhoods, this.rule, prev);
-            this.right = new WolframNode(1, this.neighborhoods, this.rule, prev);
+            this.left = new WolframNode(0, this.neighborhoods, rule, prev);
+            this.right = new WolframNode(1, this.neighborhoods, rule, prev);
         }
     }
 
@@ -59,7 +54,7 @@ public class WolframNode {
         return this.left.isSurjective() && this.right.isSurjective();
     }
 
-    public void findGoEs(String path, WolframTree.Container<String> container) {
+    public void findGoEs(String path, Container<String> container) {
         if(this.neighborhoods.isEmpty()) {
             container.add(path);
             return;
