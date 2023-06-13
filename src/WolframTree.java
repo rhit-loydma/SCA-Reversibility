@@ -1,17 +1,17 @@
 import java.util.*;
 
 public class WolframTree {
+    HashMap<String, Integer> map;
+    int rule;
+    WolframNode root;
 
-    public static void main(String[] args) {
-        for(int i = 0; i < 256; i++) {
-            //determineSurjectivity(i);
-            findGoEs(i);
-        }
-//        System.out.println(generateRuleMap(2).toString());
-//        findGoEs(2);
+    public WolframTree(int rule) {
+        this.map = this.generateRuleMap(rule);
+        this.rule = rule;
+        this.root = new WolframNode(this.map);
     }
 
-    public static HashMap<String, Integer> generateRuleMap(int rule) {
+    public HashMap<String, Integer> generateRuleMap(int rule) {
         HashMap<String, Integer> map = new HashMap<>();
         String bin = Integer.toString(rule, 2);
         bin = "0".repeat(8 - bin.length()) + bin;
@@ -23,49 +23,35 @@ public class WolframTree {
         return map;
     }
 
-    public static WolframNode buildTree(int rule) {
-        HashMap<String, Integer> map = generateRuleMap(rule);
-
-        WolframNode root = new WolframNode(map);
-        Queue<WolframNode> q = new LinkedList<>();
-        q.add(root);
-        while(!q.isEmpty()) {
-            WolframNode cur = q.poll();
-            if(cur != null) {
-//                System.out.println(cur.neighborhoods.toString());
-                cur.generateChildren();
-                q.add(cur.left);
-                q.add(cur.right);
-            }
-        }
-        return root;
-    }
-
-    public static void determineSurjectivity(int rule) {
-        WolframNode root = buildTree(rule);
-        if(root.isSurjective()) {
-            System.out.println("Rule " + rule + " is surjective.");
+    public void determineSurjectivity() {
+        if(this.root.isSurjective()) {
+            System.out.println("Rule " + this.rule + " is surjective.");
         }
     }
 
-    public static void findGoEs(int rule) {
-        WolframNode root = buildTree(rule);
-        GOEcontainer container = new GOEcontainer();
-        root.findGoEs("", container);
-        System.out.println("Rule " + rule + " has Garden of Edens: " + container.GoEs.toString());
+    public void findGoEs() {
+        Container<String> container = new Container<>();
+        this.root.findGoEs("", container);
+        System.out.println("Rule " + this.rule + " has Garden of Edens: " + container.toString());
     }
 
-    static class GOEcontainer {
-        ArrayList<String> GoEs;
+    static class Container<T> {
+        private HashSet<T> items;
 
-        public GOEcontainer() {
-            this.GoEs = new ArrayList<>();
+        public Container() {
+            this.items = new HashSet<>();
         }
 
-        public void add(String s) {
-            this.GoEs.add(s);
+        public void add(T s) {
+            this.items.add(s);
+        }
+
+        public boolean contains(T s) {
+            return this.items.contains(s);
+        }
+
+        public String toString() {
+            return this.items.toString();
         }
     }
-
-
 }

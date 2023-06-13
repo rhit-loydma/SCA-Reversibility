@@ -1,3 +1,5 @@
+import org.w3c.dom.Node;
+
 import java.util.*;
 
 public class WolframNode {
@@ -6,21 +8,22 @@ public class WolframNode {
     WolframNode left;
     WolframNode right;
     boolean frontier;
-    boolean terminal;
     HashMap<String, Integer> rule;
-    Set<Set<String>> prev;
 
     public WolframNode(HashMap<String, Integer> rule) {
         this.b=-1;
         this.rule = rule;
-        this.prev = new HashSet<>();
         this.neighborhoods = rule.keySet();
+        if(!this.neighborhoods.isEmpty()) {
+            WolframTree.Container<Set<String>> prev = new WolframTree.Container<>();
+            this.left = new WolframNode(0, this.neighborhoods, this.rule, prev);
+            this.right = new WolframNode(1, this.neighborhoods, this.rule, prev);
+        }
     }
 
-    public WolframNode(int b, Set<String> neighborhoods, HashMap<String, Integer> rule, Set<Set<String>> prev) {
+    public WolframNode(int b, Set<String> neighborhoods, HashMap<String, Integer> rule, WolframTree.Container<Set<String>> prev) {
         this.b = b;
         this.rule = rule;
-        this.prev = prev;
 
         //find this node's neighborhoods list based on b value
         this.neighborhoods = new HashSet<>();
@@ -37,32 +40,18 @@ public class WolframNode {
             }
         }
 
-        //check for terminal node
-        if(this.neighborhoods.isEmpty()) {
-            this.terminal = true;
-        } else {
-            //check for frontier node, stops infinite loop
-            for(Set<String> n: prev) {
-                if (this.neighborhoods.equals(n)) {
-                    this.frontier = true;
-                    break;
-                }
-            }
+        //check for frontier node, stops infinite loop
+        this.frontier = prev.contains(this.neighborhoods);
 
-            this.prev.add(this.neighborhoods);
-        }
-    }
-
-    //has to be done separately, so we can do breadth first
-    public void generateChildren() {
-        if(!this.frontier && !this.terminal) {
+        if (!this.neighborhoods.isEmpty() && !this.frontier) {
+            prev.add(this.neighborhoods);
             this.left = new WolframNode(0, this.neighborhoods, this.rule, prev);
             this.right = new WolframNode(1, this.neighborhoods, this.rule, prev);
         }
     }
 
     public  boolean isSurjective() {
-        if(this.terminal) {
+        if(this.neighborhoods.isEmpty()) {
             return false;
         } else if(this.frontier) {
             return true;
@@ -70,18 +59,15 @@ public class WolframNode {
         return this.left.isSurjective() && this.right.isSurjective();
     }
 
-    public void findGoEs(String path, WolframTree.GOEcontainer container) {
-        if(this.b != -1) {
-            path += this.b;
-        }
-        if(this.terminal) {
+    public void findGoEs(String path, WolframTree.Container<String> container) {
+        if(this.neighborhoods.isEmpty()) {
             container.add(path);
             return;
         } else if(this.frontier) {
             return;
         }
-        this.left.findGoEs(path, container);
-        this.right.findGoEs(path, container);
+        this.left.findGoEs(path + "0", container);
+        this.right.findGoEs(path + "1", container);
     }
 
 }

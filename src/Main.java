@@ -6,14 +6,20 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
-        config = new Config("config.properties");
-        String mode = config.getExperimentType();
-        switch (mode){
-            case("pattern"):
-                patternMode();
-                break;
-            default:
-                System.out.println("Not yet implemented");
+//        config = new Config("config.properties");
+//        String mode = config.getExperimentType();
+//        switch (mode){
+//            case("pattern"):
+//                patternMode();
+//                break;
+//            default:
+//                System.out.println("Not yet implemented");
+//        }
+
+        for(int i = 0; i < 256; i++) {
+            WolframTree tree = new WolframTree(i);
+            tree.determineSurjectivity();
+            tree.findGoEs();
         }
     }
 
