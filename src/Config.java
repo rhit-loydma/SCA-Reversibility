@@ -1,6 +1,6 @@
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.Properties;
+import java.util.*;
 
 public class Config {
     Properties prop;
@@ -20,7 +20,7 @@ public class Config {
     }
     public String getExperimentType(){
         String input = this.prop.getProperty("experimentType");
-        String[] vals = new String[]{"pattern", "reversible", "twins", "GoE"};
+        String[] vals = new String[]{"pattern", "surjective", "GoE", "twins"};
         return this.validateParam("experimentType",input, vals);
     }
 
@@ -78,6 +78,43 @@ public class Config {
             System.exit(1);
         }
         return 0;
+    }
+
+    public String getSurjectiveMode() {
+        String[] vals = new String[]{"wolfram", "full", "crossing"};
+        String input = this.prop.getProperty("surjective.mode");
+        validateParam("surjective.mode", input, vals);
+        return input;
+    }
+
+    public int getSurjectiveStartRule() {
+        try {
+            int input = Integer.parseInt(this.prop.getProperty("surjective.startRule"));
+            if (input < 0) {
+                System.out.println("surjective.startRule input must be greater than 0");
+                System.exit(1);
+            }
+            return input;
+        } catch(NumberFormatException e) {
+            System.out.println("surjective.startRule input must be an int");
+            System.exit(1);
+        }
+        return -1;
+    }
+
+    public int getSurjectiveEndRule() {
+        try {
+            int input = Integer.parseInt(this.prop.getProperty("surjective.endRule"));
+            if (input < getSurjectiveStartRule()) {
+                System.out.println("surjective.endRule can't be less than surjective.startRule");
+                System.exit(1);
+            }
+            return input;
+        } catch(NumberFormatException e) {
+            System.out.println("surjective.endRule input must be an int");
+            System.exit(1);
+        }
+        return -1;
     }
 
     /**

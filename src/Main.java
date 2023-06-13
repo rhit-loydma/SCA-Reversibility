@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -9,43 +10,22 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
-//        config = new Config("config.properties");
-//        String mode = config.getExperimentType();
-//        switch (mode){
-//            case("pattern"):
-//                patternMode();
-//                break;
-//            default:
-//                System.out.println("Not yet implemented");
-//        }
-
-//        for(int i = 0; i < 256; i++) {
-//            WolframTree tree = new WolframTree(i);
-//            tree.determineSurjectivity();
-//            tree.findGoEs();
-//        }
-
-        HashMap<String,Character> map = new HashMap<>();
-        map.put("000", '1');
-        map.put("001", '1');
-        map.put("010", '1');
-        map.put("011", '1');
-        map.put("100", '1');
-        map.put("101", '1');
-        map.put("110", '1');
-        map.put("111", '1');
-
-        HashSet<Character> states = new HashSet<>();
-        states.add('0');
-        states.add('1');
-
-        Node n = new Node(map, states);
-        if(n.isSurjective()) {
-            System.out.println("Rule is surjective");
+        config = new Config("config.properties");
+        String mode = config.getExperimentType();
+        switch (mode){
+            case("pattern"):
+                patternMode();
+                break;
+            case("surjective"):
+                surjetiveMode();
+                break;
+            default:
+                System.out.println("Not yet implemented");
         }
-        Container<String> GOEs = new Container<>();
-        n.findGoEs("", GOEs);
-        System.out.println(GOEs.toString());
+
+//        Container<String> GOEs = new Container<>();
+//        n.findGoEs("", GOEs);
+//        System.out.println(GOEs.toString());
     }
 
     /**
@@ -55,4 +35,67 @@ public class Main {
         Generator g = new Generator(config.getPatternCrossingRule(), config.getPatternTurningRule());
         System.out.print(g.generatePattern(config.getPatternString(), config.getPatternHeight()));
     }
+
+    public static void surjetiveMode() {
+        int startRule = config.getSurjectiveStartRule();
+        int endRule = config.getSurjectiveEndRule();
+        HashSet<Character> states = new HashSet<>();
+        switch(config.getSurjectiveMode()) {
+            case("wolfram"):
+                states.add('0');
+                states.add('1');
+                break;
+            case("full"):
+                System.out.println("nyi");
+                break;
+            case("crossing"):
+                System.out.println("nyi");
+                break;
+            default:
+                System.out.println("nyi");
+                break;
+        }
+
+        HashMap<String, Character> map;
+        for(int i = startRule; i <= endRule; i++) {
+            map = getRuleMap(i);
+            Node n = new Node(map, states);
+            if(n.isSurjective()) {
+                System.out.println("Rule " + i + " is surjective");
+            } else {
+                System.out.println("Rule " + i + " is not surjective");
+            }
+        }
+    }
+
+    public static HashMap<String, Character> getRuleMap(int rule) {
+        switch(config.getSurjectiveMode()) {
+            case("wolfram"):
+                return generateRuleMapWolfram(rule);
+            case("full"):
+                System.out.println("nyi");
+                break;
+            case("crossing"):
+                System.out.println("nyi");
+                break;
+            default:
+                System.out.println("nyi");
+                break;
+        }
+        return new HashMap<String, Character>();
+    }
+
+    public static HashMap<String, Character> generateRuleMapWolfram(int rule) {
+        HashMap<String, Character> map = new HashMap<>();
+        String bin = Integer.toString(rule, 2);
+        bin = "0".repeat(8 - bin.length()) + bin;
+        for(int i = 0; i < 8; i++) {
+            String neighborhood = Integer.toBinaryString(i);
+            neighborhood = "0".repeat(3 - neighborhood.length()) + neighborhood;
+            map.put(neighborhood, bin.charAt(7 - i));
+        }
+        return map;
+    }
+
+
 }

@@ -4,33 +4,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class GardenOfEdenFinder {
-    public static void main(String[] args) {
-        HashMap<String,Character> map = new HashMap<>();
-        map.put("000", '0');
-        map.put("001", '1');
-        map.put("010", '1');
-        map.put("011", '1');
-        map.put("100", '0');
-        map.put("101", '1');
-        map.put("110", '1');
-        map.put("111", '0');
-
-        for(String k: map.keySet()) {
-            System.out.println(k + " " + findPredecessors(k, false, generateRuleMap(115)));
-        }
-    }
-
-    public static HashMap<String, Character> generateRuleMap(int rule) {
-        HashMap<String, Character> map = new HashMap<>();
-        String bin = Integer.toString(rule, 2);
-        bin = "0".repeat(8 - bin.length()) + bin;
-        for(int i = 0; i < 8; i++) {
-            String neighborhood = Integer.toBinaryString(i);
-            neighborhood = "0".repeat(3 - neighborhood.length()) + neighborhood;
-            map.put(neighborhood, bin.charAt(7 - i));
-        }
-        return map;
-    }
 
     public static ArrayList<String> findPredecessors(String config, boolean wrapsAround, HashMap<String, Character> rule) {
         ArrayList<String> a = new ArrayList<>();
