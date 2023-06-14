@@ -18,51 +18,77 @@ public class Config {
             e.printStackTrace();
         }
     }
-    public String getExperimentType(){
-        String input = this.prop.getProperty("experimentType");
-        String[] vals = new String[]{"pattern", "surjective", "GoE", "twins"};
-        return this.validateParam("experimentType",input, vals);
+    public String getType(){
+        String input = this.prop.getProperty("type");
+        String[] vals = new String[]{"pattern", "surjective", "GoE"};
+        return this.validateParam("type",input, vals);
+    }
+
+    public String getMode(){
+        String input = this.prop.getProperty("mode");
+        //TODO get wolfram mode to work with pattern mode
+        String[] vals = new String[]{"full", "simplified", "wolfram"};
+        return this.validateParam("mode",input, vals);
+    }
+
+    public int getTurningRule() {
+        try {
+            int input = Integer.parseInt(this.prop.getProperty("turningRule"));
+            int max = 15;
+            if(getMode().equals("full")) {
+                max = 511;
+            }
+            if (input < 0 || input > max) {
+                System.out.println("turningRule input must be between 0 and " + max);
+                System.exit(1);
+            }
+            return input;
+        } catch(NumberFormatException e) {
+            if(this.prop.getProperty("turningRule").equals("ALL")) {
+                return -1;
+            }
+            System.out.println("turningRule input must be an int");
+            System.exit(1);
+        }
+        return 0;
+    }
+
+    public int getCrossingRule() {
+        try {
+            int input = Integer.parseInt(this.prop.getProperty("crossingRule"));
+            int max = 15;
+            if(getMode().equals("full")) {
+                max = 511;
+            }
+            if (input < 0 || input > max) {
+                System.out.println("crossingRule input must be between 0 and " + max);
+                System.exit(1);
+            }
+            return input;
+        } catch(NumberFormatException e) {
+            if(this.prop.getProperty("crossingRule").equals("ALL")) {
+                return -1;
+            }
+            System.out.println("crossingRule input must be an int");
+            System.exit(1);
+        }
+        return 0;
     }
 
     //section: pattern experiment params
     public String getPatternString() {
-        String[] vals = new String[]{"SNN", "NNN", "NSN", "UNN", "UUN", "NUN", "SSR", "SSL"};
+        String[] vals;
+        if(getMode().equals("full")) {
+            vals = new String[]{"SNN", "NNN", "NSN", "UNN", "UUN", "NUN", "SSR", "SSL"};
+        } else {
+            vals = new String[]{"L", "R", "F", "B"};
+        }
         String input = this.prop.getProperty("pattern.startingString");
         String[] cells = input.split(" ");
         for(int i = 0; i < cells.length; i++) {
             validateParam("pattern.StartingString cell " + i, cells[i], vals);
         }
         return input;
-    }
-
-    public int getPatternTurningRule() {
-        try {
-            int input = Integer.parseInt(this.prop.getProperty("pattern.turningRule"));
-            if (input < 0 || input > 511) {
-                System.out.println("pattern.turningRule input must be between 0 and 511");
-                System.exit(1);
-            }
-            return input;
-        } catch(NumberFormatException e) {
-            System.out.println("pattern.turningRule input must be an int");
-            System.exit(1);
-        }
-        return 0;
-    }
-
-    public int getPatternCrossingRule() {
-        try {
-            int input = Integer.parseInt(this.prop.getProperty("pattern.crossingRule"));
-            if (input < 0 || input > 511) {
-                System.out.println("pattern.crossingRule input must be between 0 and 511");
-                System.exit(1);
-            }
-            return input;
-        } catch(NumberFormatException e) {
-            System.out.println("pattern.crossingRule input must be an int");
-            System.exit(1);
-        }
-        return 0;
     }
 
     public int getPatternHeight() {
@@ -80,41 +106,47 @@ public class Config {
         return 0;
     }
 
-    public String getSurjectiveMode() {
-        String[] vals = new String[]{"wolfram", "full", "crossing"};
-        String input = this.prop.getProperty("surjective.mode");
-        validateParam("surjective.mode", input, vals);
-        return input;
-    }
-
-    public int getSurjectiveStartRule() {
+    public int getGoEstartWidth() {
         try {
-            int input = Integer.parseInt(this.prop.getProperty("surjective.startRule"));
+            int input = Integer.parseInt(this.prop.getProperty("goe.startWidth"));
             if (input < 0) {
-                System.out.println("surjective.startRule input must be greater than 0");
+                System.out.println("goe.startWidth input must be greater than 0");
                 System.exit(1);
             }
             return input;
         } catch(NumberFormatException e) {
-            System.out.println("surjective.startRule input must be an int");
+            System.out.println("goe.startWidth input must be an int");
+            System.exit(1);
+        }
+        return 0;
+    }
+
+    public int getGoEendWidth() {
+        try {
+            int input = Integer.parseInt(this.prop.getProperty("goe.endWidth"));
+            if (input < getGoEstartWidth()) {
+                System.out.println("goe.startWidth can't be less than goe.endWidth");
+                System.exit(1);
+            }
+            return input;
+        } catch(NumberFormatException e) {
+            System.out.println("goe.startWidth input must be an int");
             System.exit(1);
         }
         return -1;
     }
 
-    public int getSurjectiveEndRule() {
-        try {
-            int input = Integer.parseInt(this.prop.getProperty("surjective.endRule"));
-            if (input < getSurjectiveStartRule()) {
-                System.out.println("surjective.endRule can't be less than surjective.startRule");
-                System.exit(1);
-            }
-            return input;
-        } catch(NumberFormatException e) {
-            System.out.println("surjective.endRule input must be an int");
+    public boolean getGoEwrapsAround() {
+        String input = this.prop.getProperty("goe.wrapsAround");
+        if(input.equals("true")) {
+            return true;
+        } else if(input.equals("false")) {
+            return false;
+        } else {
+            System.out.println("goe.wrapsAround input must be 'true' or 'false'");
             System.exit(1);
         }
-        return -1;
+        return false;
     }
 
     /**
