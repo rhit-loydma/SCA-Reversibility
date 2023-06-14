@@ -7,29 +7,28 @@ public class Node {
     HashSet<Character> states;
     boolean frontier;
 
-    public Node(HashMap<String, Character> rule, HashSet<Character> states) {
+    public Node(Rule rule) {
         this.b = '_';
-        this.neighborhoods = rule.keySet();
-        this.states = states;
+        this.neighborhoods = rule.map.keySet();
+        this.states = rule.states;
         Container<Set<String>> prev = new Container<>();
         this.children = new HashMap<>();
-        for(Character s: states) {
-            children.put(s, new Node(s, this.neighborhoods, rule, prev, states));
+        for(Character s: this.states) {
+            children.put(s, new Node(s, this.neighborhoods, rule, prev));
         }
     }
 
-    public Node(char b, Set<String> neighborhoods, HashMap<String, Character> rule,
-                Container<Set<String>> prev, HashSet<Character> states) {
+    public Node(char b, Set<String> neighborhoods, Rule rule, Container<Set<String>> prev) {
         this.b = b;
-        this.states = states;
+        this.states = rule.states;
 
         //find this node's neighborhoods list based on b value
         this.neighborhoods = new HashSet<>();
         for(String c: neighborhoods) {
             String last = c.substring(1);
-            for(Character s: states) {
+            for(Character s: this.states) {
                 String x = last + s;
-                if(rule.get(x) == b) {
+                if(rule.getNext(x) == b) {
                     this.neighborhoods.add(x);
                 }
             }
@@ -41,8 +40,8 @@ public class Node {
         if (!this.neighborhoods.isEmpty() && !this.frontier) {
             prev.add(this.neighborhoods);
             this.children = new HashMap<>();
-            for(Character s: states) {
-                children.put(s, new Node(s, this.neighborhoods, rule, prev, states));
+            for(Character s: this.states) {
+                children.put(s, new Node(s, this.neighborhoods, rule, prev));
             }
         }
     }
@@ -53,7 +52,7 @@ public class Node {
         } else if(this.frontier) {
             return true;
         }
-        for(Character s: states) {
+        for(Character s: this.states) {
             if(!children.get(s).isSurjective()) {
                 return false;
             }

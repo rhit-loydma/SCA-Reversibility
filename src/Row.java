@@ -6,18 +6,11 @@ public class Row {
     public static final String THREAD = "\u001B[1;36m";
     public static final String GRID = "\u001B[31m";
     char[] cells;
-    HashMap<String, Character> rule;
+    Rule rule;
     boolean parity;
     boolean wrapAround;
 
-    /**
-     * Class constructor. Used for creating the first row based on user input.
-     * @param rep string representation of a row
-     * @param cRule the decimal representation of the crossing rule
-     * @param tRule the decimal representation of the turning rule
-     * @param parity if the row is offset from the vertical edge
-     */
-    public Row(char[] cells, HashMap<String, Character> rule, boolean parity, boolean wrapAround) {
+    public Row(char[] cells, Rule rule, boolean parity, boolean wrapAround) {
         this.cells = cells;
         this.rule = rule;
         this.parity = parity;
@@ -62,22 +55,9 @@ public class Row {
                 r = i;
             }
             neighborhood = "" + this.cells[l] + this.cells[r];
-            newCells[i] = this.rule.get(neighborhood);
+            newCells[i] = this.rule.getNext(neighborhood);
         }
         return new Row(newCells, rule, !parity, this.wrapAround);
-//        Cell[] newCells = new Cell[this.cells.length];
-//
-//        for (int i = 0; i < this.cells.length; i++) {
-//            int l, r;
-//            if (!parity) { //next row will have parity
-//                l = i;
-//                r = (i + 1) % this.cells.length;
-//            } else {
-//                l = (i - 1 + this.cells.length) % this.cells.length;
-//                r = i;
-//            }
-//            Cell left = this.cells[l];
-//            Cell right = this.cells[r];
 //            CrossingStatus cs = this.cRule.getStatus(left, right);
 //            TurningStatus ts = this.tRule.getStatus(left, right);
 //
@@ -97,18 +77,13 @@ public class Row {
 //            if(!(lts == TurningStatus.SLANTED && rts == TurningStatus.SLANTED)) {
 //                cs = CrossingStatus.NO;
 //            }
-//
-//            newCells[i] = new Cell(cs, lts, rts);
-//        }
-//
-//        return new Row(newCells, this.cRule, this.tRule, !this.parity);
     }
 
     public HashSet<Row> findPredecessors() {
         ArrayList<String> a = new ArrayList<>();
 
-        for(String n: rule.keySet()) {
-            if(rule.get(n) == this.cells[0]) {
+        for(String n: rule.map.keySet()) {
+            if(rule.getNext(n) == this.cells[0]) {
                 a.add(n);
             }
         }
@@ -119,9 +94,9 @@ public class Row {
             for(String path: a) { //iterate through current possibilities
                 String last = path.substring(path.length() - 2);
                 //todo optimize so we just add on a state instead of going through every neighborhood
-                for(String n: rule.keySet()) { //every neighborhood
+                for(String n: rule.map.keySet()) { //every neighborhood
                     String first = n.substring(0, 2);
-                    if(rule.get(n) == curChar && last.equals(first)) {
+                    if(rule.getNext(n) == curChar && last.equals(first)) {
                         b.add(path + n.substring(n.length() - 1));
                     }
                 }
