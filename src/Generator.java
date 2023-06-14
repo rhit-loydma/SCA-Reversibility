@@ -1,17 +1,11 @@
+import java.util.HashMap;
 import java.util.Stack;
 
 public class Generator {
-    int cRule;
-    int tRule;
+    HashMap<String, Character> rule;
 
-    /**
-     * Class constructor for a certain rule set
-     * @param crossingRule
-     * @param turningRule
-     */
-    public Generator(int crossingRule, int turningRule) {
-        this.cRule = crossingRule;
-        this.tRule = turningRule;
+    public Generator(HashMap<String, Character> rule) {
+        this.rule = rule;
     }
 
     /**
@@ -20,16 +14,15 @@ public class Generator {
      * @param height the number of rows to include (including the starting row)
      * @return the pattern
      */
-    public String generatePattern(String start, int height) {
+    public String generatePattern(char[] start, int height) {
         Stack<String> rows = new Stack<>();
-        Row r = new Row(start, this.cRule, this.tRule, true);
+        Row r = new Row(start, this.rule, true, true);
         for(int i = 0; i < height; i++) {
             rows.push(r.toString() + "     " + i + "\n");
             r = r.getSuccessor();
         }
 
-        StringBuilder sb = new StringBuilder("Crossing Rule: " + this.cRule
-                + "\nTurning Rule: " + this.tRule + "\n");
+        StringBuilder sb = new StringBuilder("Rule: " + this.rule + "\n");
         while(!rows.isEmpty()){
             sb.append(rows.pop());
         }

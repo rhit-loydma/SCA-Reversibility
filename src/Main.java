@@ -28,7 +28,7 @@ public class Main {
      * Prints a pattern using initial conditions defined in a config file
      */
     public static void patternMode(){
-        String start = config.getPatternString();
+        char[] start = config.getPatternString();
         int height = config.getPatternHeight();
         int crossing = config.getCrossingRule();
         int turning = config.getTurningRule();
@@ -40,22 +40,22 @@ public class Main {
             for(int i = 0; i < max; i++) {
                 if(turning == -1) {
                     for(int j = 0; j < max; j++) {
-                        Generator g = new Generator(i, j);
+                        Generator g = new Generator(getRuleMap(j*max + i));
                         System.out.print(g.generatePattern(start, height));
                     }
                 } else {
-                    Generator g = new Generator(i, turning);
+                    Generator g = new Generator(getRuleMap(turning*max + i));
                     System.out.print(g.generatePattern(start, height));
                 }
             }
         } else {
             if(turning == -1) {
                 for(int j = 0; j < max; j++) {
-                    Generator g = new Generator(crossing, j);
+                    Generator g = new Generator(getRuleMap(j*max + crossing));
                     System.out.print(g.generatePattern(start, height));
                 }
             } else {
-                Generator g = new Generator(crossing, turning);
+                Generator g = new Generator(getRuleMap(turning*max + crossing));
                 System.out.print(g.generatePattern(start, height));
             }
         }

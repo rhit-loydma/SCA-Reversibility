@@ -76,7 +76,7 @@ public class Config {
     }
 
     //section: pattern experiment params
-    public String getPatternString() {
+    public char[] getPatternString() {
         String[] vals;
         if(getMode().equals("full")) {
             vals = new String[]{"SNN", "NNN", "NSN", "UNN", "UUN", "NUN", "SSR", "SSL"};
@@ -84,11 +84,11 @@ public class Config {
             vals = new String[]{"L", "R", "F", "B"};
         }
         String input = this.prop.getProperty("pattern.startingString");
-        String[] cells = input.split(" ");
+        char[] cells = input.toCharArray();
         for(int i = 0; i < cells.length; i++) {
-            validateParam("pattern.StartingString cell " + i, cells[i], vals);
+            validateParam("pattern.StartingString cell " + i, ""+cells[i], vals);
         }
-        return input;
+        return input.toCharArray();
     }
 
     public int getPatternHeight() {
