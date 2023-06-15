@@ -31,6 +31,19 @@ public class Config {
         return this.validateParam("mode",input, vals);
     }
 
+    public boolean getVerbose() {
+        String input = this.prop.getProperty("verbose");
+        if(input.equals("true")) {
+            return true;
+        } else if(input.equals("false")) {
+            return false;
+        } else {
+            System.out.println("verbose input must be 'true' or 'false'");
+            System.exit(1);
+        }
+        return false;
+    }
+
     public int getTurningRule() {
         try {
             int input = Integer.parseInt(this.prop.getProperty("turningRule"));

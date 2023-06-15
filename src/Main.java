@@ -155,11 +155,14 @@ public class Main {
             r = r.getSuccessor();
         }
 
-        StringBuilder sb = new StringBuilder("Rule: " + rule.number + "\n");
+        StringBuilder sb = new StringBuilder(rule.toString() + "\n");
         while(!rows.isEmpty()){
             sb.append(rows.pop());
         }
         System.out.println(sb.toString());
+        if(config.getVerbose()) {
+            System.out.println("\n"+rule.toDebugString());
+        }
     }
 
     public static void checkSurjective(Rule rule) {
@@ -169,20 +172,27 @@ public class Main {
         } else {
             System.out.println("Rule " + rule.number + " is not surjective");
         }
+        if(config.getVerbose()) {
+            System.out.println("\n"+rule.toDebugString());
+        }
     }
 
     public static void findTwins(Rule rule, char[] cells) {
         Row r = new Row(cells, rule, false, true);
         HashSet<Row> twins = r.findTwins();
         if(twins.size() == 0){
-            System.out.println(r.toString() + " has no twins under " + rule.toString());
+            System.out.println(r.toString() + "has no twins under " + rule.toString());
         } else {
-            System.out.println(r.toString() + " under rule " + rule.toString() + " has " + twins.size() + " twin(s):");
-            for(Row t: twins) {
-                System.out.println("  " + t.toString());
+            System.out.println(r.toString() + "under rule " + rule.toString() + " has " + twins.size() + " twin(s)");
+            if(config.getVerbose()){
+                for(Row t: twins) {
+                    System.out.println("  " + t.toString());
+                }
             }
         }
-        //System.out.println(rule.toDebugString());
+        if(config.getVerbose()) {
+            System.out.println("\n"+rule.toDebugString());
+        }
     }
 
     public static void findGoEs(Rule rule, int width, boolean wrapAround) {
@@ -198,15 +208,19 @@ public class Main {
                 nonGoes.add(r);
             }
         }
-        System.out.println(rule.toString() + " has " + goes.size() + " GoE(s):");
-        for(Row r: goes) {
-            System.out.println("  " + r.toString());
+        System.out.println(rule.toString() + " has " + goes.size() + " GoE(s)");
+        if(config.getVerbose()) {
+            for(Row r: goes) {
+                System.out.println("  " + r.toString());
+            }
         }
-        System.out.println(rule.toString() + " has " + nonGoes.size() + " non-GoE(s):");
-        for(Row r: nonGoes) {
-            System.out.println("  " + r.toString());
+        System.out.println(rule.toString() + " has " + nonGoes.size() + " non-GoE(s)");
+        if(config.getVerbose()) {
+            for(Row r: nonGoes) {
+                System.out.println("  " + r.toString());
+            }
+            System.out.println("\n"+rule.toDebugString());
         }
-        System.out.println(rule.toDebugString());
     }
 
     public static void generateStrings(HashSet<Character> states, int width, String path, Container<String> configs) {
