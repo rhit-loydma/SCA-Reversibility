@@ -1,10 +1,11 @@
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class Container<T> {
-    private HashSet<T> items;
+    public ArrayList<T> items;
 
     public Container() {
-        this.items = new HashSet<>();
+        this.items = new ArrayList<>();
     }
 
     public void add(T s) {
@@ -18,4 +19,6 @@ public class Container<T> {
     public String toString() {
         return this.items.toString();
     }
+
+    public int size() { return this.items.size(); }
 }

@@ -72,8 +72,6 @@ public class Rule {
             sb.append(" ");
         }
         sb.append('\n');
-//        sb.append("-".repeat(states.size()+2));
-//        sb.append('\n');
         for(char c: states) {
             sb.append("\u001B[1;36m" + c);
             sb.append("\u001B[0m" + " ");

@@ -95,27 +95,21 @@ public class Row {
             char curChar = this.cells[i];
             for(String path: a) { //iterate through current possibilities
                 String last = path.substring(path.length() - 1);
-                //todo optimize so we just add on a state instead of going through every neighborhood
-                for(String n: rule.map.keySet()) { //every neighborhood
-                    String first = n.substring(0, 1);
-                    if(rule.getNext(n) == curChar && last.equals(first)) {
-                        b.add(path + n.substring(n.length() - 1));
+                for(char c: rule.states) { //every neighborhood
+                    if(rule.getNext(last + c) == curChar) {
+                        b.add(path + c);
                     }
                 }
             }
             a = b;
         }
-
         HashSet<Row> set = new HashSet<>();
-        if(this.wrapAround) {
-            for(int i = 0; i < a.size(); i++) {
-                String cur = a.get(i);
-                String first = cur.substring(0,1);
-                String last = cur.substring(cur.length()-1);
-                if(first.equals(last)) {
-                    String s = cur.substring(0,cur.length()-1);
-                    set.add(new Row(s.toCharArray(), this.rule, !this.parity, this.wrapAround));
-                }
+        for (String cur : a) {
+            String first = cur.substring(0, 1);
+            String last = cur.substring(cur.length() - 1);
+            if (!this.wrapAround || first.equals(last)) {
+                String s = cur.substring(0, cur.length() - 1);
+                set.add(new Row(s.toCharArray(), this.rule, !this.parity, this.wrapAround));
             }
         }
         return set;
