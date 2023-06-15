@@ -1,10 +1,12 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
 public class Row {
     public static final String THREAD = "\u001B[1;36m";
     public static final String GRID = "\u001B[31m";
+    public static final String RESET = "\u001B[0m";
     char[] cells;
     Rule rule;
     boolean parity;
@@ -30,7 +32,7 @@ public class Row {
         s.append(GRID + "|");
         for (char c : this.cells) {
             s.append(THREAD + " " + c + " ");
-            s.append(GRID + "|");
+            s.append(GRID + "|" + RESET);
         }
         if (!parity) {
             s.append("  ");
@@ -92,10 +94,10 @@ public class Row {
             ArrayList<String> b = new ArrayList<>();
             char curChar = this.cells[i];
             for(String path: a) { //iterate through current possibilities
-                String last = path.substring(path.length() - 2);
+                String last = path.substring(path.length() - 1);
                 //todo optimize so we just add on a state instead of going through every neighborhood
                 for(String n: rule.map.keySet()) { //every neighborhood
-                    String first = n.substring(0, 2);
+                    String first = n.substring(0, 1);
                     if(rule.getNext(n) == curChar && last.equals(first)) {
                         b.add(path + n.substring(n.length() - 1));
                     }
@@ -104,21 +106,25 @@ public class Row {
             a = b;
         }
 
+        HashSet<Row> set = new HashSet<>();
         if(this.wrapAround) {
             for(int i = 0; i < a.size(); i++) {
                 String cur = a.get(i);
-                String first = cur.substring(0,2);
-                String last = cur.substring(cur.length()-2);
-                if(!first.equals(last)) {
-                    a.remove(i--);
+                String first = cur.substring(0,1);
+                String last = cur.substring(cur.length()-1);
+                if(first.equals(last)) {
+                    String s = cur.substring(0,cur.length()-1);
+                    set.add(new Row(s.toCharArray(), this.rule, !this.parity, this.wrapAround));
                 }
             }
         }
+        return set;
+    }
 
-        HashSet<Row> set = new HashSet<>();
-        for(String r: a){
-            set.add(new Row(r.toCharArray(), this.rule, !this.parity, this.wrapAround));
-        }
+    public HashSet<Row> findTwins() {
+        Row s = this.getSuccessor();
+        HashSet<Row> set = s.findPredecessors();
+        set.removeIf(r -> Arrays.equals(this.cells, r.cells));
         return set;
     }
 }

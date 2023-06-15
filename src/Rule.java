@@ -61,4 +61,29 @@ public class Rule {
         };
     }
 
+    public String toString() {
+        return "crossing rule: " + this.number/16 + ", turning Rule: " + this.number % 16;
+    }
+
+    public String toDebugString(){
+        StringBuilder sb = new StringBuilder("\u001B[1;36m" + "  ");
+        for(char c: states) { //header row
+            sb.append(c);
+            sb.append(" ");
+        }
+        sb.append('\n');
+//        sb.append("-".repeat(states.size()+2));
+//        sb.append('\n');
+        for(char c: states) {
+            sb.append("\u001B[1;36m" + c);
+            sb.append("\u001B[0m" + " ");
+            for(char d: states) {
+                sb.append(map.get(""+c+d));
+                sb.append(" ");
+            }
+            sb.append('\n');
+        }
+        return sb.toString();
+    }
+
 }

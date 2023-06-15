@@ -20,7 +20,7 @@ public class Config {
     }
     public String getType(){
         String input = this.prop.getProperty("type");
-        String[] vals = new String[]{"pattern", "surjective", "GoE"};
+        String[] vals = new String[]{"pattern", "surjective", "GoE", "twins"};
         return this.validateParam("type",input, vals);
     }
 
@@ -77,12 +77,11 @@ public class Config {
 
     //section: pattern experiment params
     public char[] getPatternString() {
-        String[] vals;
-        if(getMode().equals("full")) {
-            vals = new String[]{"SNN", "NNN", "NSN", "UNN", "UUN", "NUN", "SSR", "SSL"};
-        } else {
-            vals = new String[]{"L", "R", "F", "B"};
-        }
+        String[] vals = switch (getMode()) {
+            case ("full") -> new String[]{"SNN", "NNN", "NSN", "UNN", "UUN", "NUN", "SSR", "SSL"};
+            case ("simplified") -> new String[]{"L", "R", "F", "B"};
+            default -> new String[]{"0", "1"};
+        };
         String input = this.prop.getProperty("pattern.startingString");
         char[] cells = input.toCharArray();
         for(int i = 0; i < cells.length; i++) {
@@ -106,6 +105,7 @@ public class Config {
         return 0;
     }
 
+    //section: twin experiment params
     public int getGoEstartWidth() {
         try {
             int input = Integer.parseInt(this.prop.getProperty("goe.startWidth"));
@@ -147,6 +147,21 @@ public class Config {
             System.exit(1);
         }
         return false;
+    }
+
+    //section: twin experiment params
+    public char[] getTwinString() {
+        String[] vals = switch (getMode()) {
+            case ("full") -> new String[]{"SNN", "NNN", "NSN", "UNN", "UUN", "NUN", "SSR", "SSL"};
+            case ("simplified") -> new String[]{"L", "R", "F", "B"};
+            default -> new String[]{"0", "1"};
+        };
+        String input = this.prop.getProperty("twins.configuration");
+        char[] cells = input.toCharArray();
+        for(int i = 0; i < cells.length; i++) {
+            validateParam("twins.configuration cell " + i, ""+cells[i], vals);
+        }
+        return input.toCharArray();
     }
 
     /**

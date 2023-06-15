@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Stack;
+import java.util.*;
 
 public class Main {
     static Config config;
@@ -19,6 +16,9 @@ public class Main {
                 break;
             case("surjective"):
                 surjetiveMode();
+                break;
+            case("twins")  :
+                twinsMode();
                 break;
             default: //GoE
                 System.out.println("Not yet implemented");
@@ -89,6 +89,36 @@ public class Main {
         }
     }
 
+    public static void twinsMode() {
+        char[] cells = config.getTwinString();
+        int crossing = config.getCrossingRule();
+        int turning = config.getTurningRule();
+        int max = 16;
+        String mode = config.getMode();
+        if(mode.equals("full")) {
+            max = 512;
+        }
+        if(turning == -1) {
+            for(int i = 0; i < max; i++) {
+                if(crossing == -1) {
+                    for(int j = 0; j < max; j++) {
+                        findTwins(new Rule(mode, i*max + j), cells);
+                    }
+                } else {
+                    findTwins(new Rule(mode, i*max + crossing), cells);
+                }
+            }
+        } else {
+            if(crossing == -1) {
+                for(int j = 0; j < max; j++) {
+                    findTwins(new Rule(mode, turning*max + j), cells);
+                }
+            } else {
+                findTwins(new Rule(mode, turning*max + crossing), cells);
+            }
+        }
+    }
+
     public static void generatePattern(Rule rule, char[] start, int height) {
         Stack<String> rows = new Stack<>();
         Row r = new Row(start, rule, true, true);
@@ -111,5 +141,19 @@ public class Main {
         } else {
             System.out.println("Rule " + rule.number + " is not surjective");
         }
+    }
+
+    public static void findTwins(Rule rule, char[] cells) {
+        Row r = new Row(cells, rule, false, true);
+        HashSet<Row> twins = r.findTwins();
+        if(twins.size() == 0){
+            System.out.println(r.toString() + " has no twins under " + rule.toString());
+        } else {
+            System.out.println(r.toString() + " under rule " + rule.toString() + " has " + twins.size() + " twin(s):");
+            for(Row t: twins) {
+                System.out.println("  " + t.toString());
+            }
+        }
+        //System.out.println(rule.toDebugString());
     }
 }
