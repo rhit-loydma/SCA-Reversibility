@@ -44,6 +44,23 @@ public class Config {
         return false;
     }
 
+    public boolean getLogging() {
+        String input = this.prop.getProperty("logging");
+        if(input.equals("true")) {
+            if(!(this.getCrossingRule()==-1) || !(this.getTurningRule()==-1)) {
+                System.out.println("logging can only occur on all rules");
+                System.exit(1);
+            }
+            return true;
+        } else if(input.equals("false")) {
+            return false;
+        } else {
+            System.out.println("logging input must be 'true' or 'false'");
+            System.exit(1);
+        }
+        return false;
+    }
+
     public int getTurningRule() {
         try {
             int input = Integer.parseInt(this.prop.getProperty("turningRule"));
@@ -163,7 +180,7 @@ public class Config {
     }
 
     //section: twin experiment params
-    public char[] getTwinString() {
+    public String getTwinString() {
         String[] vals = switch (getMode()) {
             case ("full") -> new String[]{"SNN", "NNN", "NSN", "UNN", "UUN", "NUN", "SSR", "SSL"};
             case ("simplified") -> new String[]{"L", "R", "F", "B"};
@@ -174,7 +191,7 @@ public class Config {
         for(int i = 0; i < cells.length; i++) {
             validateParam("twins.configuration cell " + i, ""+cells[i], vals);
         }
-        return input.toCharArray();
+        return input;
     }
 
     /**
