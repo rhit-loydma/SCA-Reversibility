@@ -9,13 +9,13 @@ public class Row {
     char[] cells;
     Rule rule;
     boolean parity;
-    boolean wrapAround;
+    String bc;
 
-    public Row(char[] cells, Rule rule, boolean parity, boolean wrapAround) {
+    public Row(char[] cells, Rule rule, boolean parity, String boundaryCondition) {
         this.cells = cells;
         this.rule = rule;
         this.parity = parity;
-        this.wrapAround = wrapAround;
+        this.bc = boundaryCondition;
     }
 
     /**
@@ -39,33 +39,30 @@ public class Row {
         return s.toString();
     }
 
+    public String toStringBracelet() {
+        StringBuilder s = new StringBuilder();
+        for (char c : this.cells) {
+            switch (c) {
+                case 'L' -> s.append("f,");
+                case 'R' -> s.append("b,");
+                case 'F' -> s.append("fb,");
+                default -> s.append("bf,");
+            }
+        }
+        s.setLength(s.length()-1);
+        return s.toString();
+    }
+
     /**
      * Creates the next iteration of a row in a SCA
      * @return the next iteration's row
      */
     public Row getSuccessor() {
-        char[] newCells = new char[this.cells.length];
-        String neighborhood;
-        if(this.wrapAround) {
-            for(int i = 0; i < this.cells.length; i++) {
-                int l, r;
-                if (!parity) { //next row will have parity
-                    l = i;
-                    r = (i + 1) % this.cells.length;
-                } else {
-                    l = (i - 1 + this.cells.length) % this.cells.length;
-                    r = i;
-                }
-                neighborhood = "" + this.cells[l] + this.cells[r];
-                newCells[i] = this.rule.getNext(neighborhood);
-            }
-        } else {
-            for(int i = 0; i < this.cells.length - 1; i++) {
-                neighborhood = "" + this.cells[i] + this.cells[i+1];
-                newCells[i] = this.rule.getNext(neighborhood);
-            }
-        }
-        return new Row(newCells, rule, !parity, this.wrapAround);
+        return switch (this.bc) {
+            case "wrap" -> this.getSuccessorWrap();
+            case "reflect" -> this.getSuccessorReflect();
+            default -> this.getSuccessorNone();
+        };
 //            CrossingStatus cs = this.cRule.getStatus(left, right);
 //            TurningStatus ts = this.tRule.getStatus(left, right);
 //
@@ -85,6 +82,77 @@ public class Row {
 //            if(!(lts == TurningStatus.SLANTED && rts == TurningStatus.SLANTED)) {
 //                cs = CrossingStatus.NO;
 //            }
+    }
+
+    public Row getSuccessorWrap() {
+        char[] newCells = new char[this.cells.length];
+
+        String neighborhood;
+        for(int i = 0; i < this.cells.length; i++) {
+            int l, r;
+            if (!parity) { //next row will have parity
+                l = i;
+                r = (i + 1) % this.cells.length;
+            } else {
+                l = (i - 1 + this.cells.length) % this.cells.length;
+                r = i;
+            }
+            neighborhood = "" + this.cells[l] + this.cells[r];
+            newCells[i] = this.rule.getNext(neighborhood);
+        }
+
+        return new Row(newCells, rule, !parity, this.bc);
+    }
+
+    public Row getSuccessorReflect() {
+        char[] newCells;
+        String neighborhood;
+        int offset;
+
+        if(this.parity) { //row with less cells, need to use reflection rules
+            newCells = new char[this.cells.length + 1];
+
+            //get left edge
+            char left = getReflectedCell(this.cells[0]);
+            newCells[0] = this.rule.getNext("" + left + this.cells[0]);
+
+            //get right edge
+            char right = getReflectedCell(this.cells[this.cells.length-1]);
+            newCells[this.cells.length] = this.rule.getNext("" + this.cells[this.cells.length-1] + right);
+
+            offset = 1;
+        } else { //"normal" case
+            newCells = new char[this.cells.length - 1];
+            offset = 0;
+        }
+
+        for(int i = 0; i < this.cells.length - 1; i++) {
+            neighborhood = "" + this.cells[i] + this.cells[i+1];
+            newCells[i+offset] = this.rule.getNext(neighborhood);
+        }
+
+        return new Row(newCells, rule, !parity, this.bc);
+    }
+
+    public static char getReflectedCell(char cell) {
+        switch (cell) {
+            case 'L' -> { return 'R'; }
+            case 'R' -> { return 'L'; }
+            case 'F' -> { return 'B'; }
+            default -> {return 'F'; }
+        }
+    }
+
+    public Row getSuccessorNone() {
+        char[] newCells = new char[this.cells.length];
+
+        String neighborhood;
+        for(int i = 0; i < this.cells.length - 1; i++) {
+            neighborhood = "" + this.cells[i] + this.cells[i+1];
+            newCells[i] = this.rule.getNext(neighborhood);
+        }
+
+        return new Row(newCells, rule, !parity, this.bc);
     }
 
     public HashSet<Row> findPredecessors() {
@@ -113,9 +181,9 @@ public class Row {
         for (String cur : a) {
             char first = cur.charAt(0);
             char last = cur.charAt(cur.length()-1);
-            if (!this.wrapAround || first == last) {
+            if (!(this.bc.equals("wrap")) || first == last) {
                 String s = cur.substring(0, cur.length() - 1);
-                set.add(new Row(s.toCharArray(), this.rule, !this.parity, this.wrapAround));
+                set.add(new Row(s.toCharArray(), this.rule, !this.parity, this.bc));
             }
         }
         return set;

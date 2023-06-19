@@ -31,6 +31,7 @@ public class Main {
         int height = config.getPatternHeight();
         int crossing = config.getCrossingRule();
         int turning = config.getTurningRule();
+        String bc = config.getBoundaryCondition();
         int max = 16;
         String mode = config.getMode();
         if(mode.equals("full")) {
@@ -40,19 +41,19 @@ public class Main {
             for(int i = 0; i < max; i++) {
                 if(crossing == -1) {
                     for(int j = 0; j < max; j++) {
-                        generatePattern(new Rule(mode, i*max + j), start, height);
+                        generatePattern(new Rule(mode, i*max + j), start, height, bc);
                     }
                 } else {
-                    generatePattern(new Rule(mode, i*max + crossing), start, height);
+                    generatePattern(new Rule(mode, i*max + crossing), start, height, bc);
                 }
             }
         } else {
             if(crossing == -1) {
                 for(int j = 0; j < max; j++) {
-                    generatePattern(new Rule(mode, turning*max + j), start, height);
+                    generatePattern(new Rule(mode, turning*max + j), start, height, bc);
                 }
             } else {
-                generatePattern(new Rule(mode, turning*max + crossing), start, height);
+                generatePattern(new Rule(mode, turning*max + crossing), start, height, bc);
             }
         }
     }
@@ -96,7 +97,7 @@ public class Main {
         String mode = config.getMode();
         int start = config.getStartWidth();
         int end = config.getEndWidth();
-        boolean wrap = config.getWrapsAround();
+        String bc = config.getBoundaryCondition();
         int crossing = config.getCrossingRule();
         int turning = config.getTurningRule();
 
@@ -112,23 +113,23 @@ public class Main {
                     System.out.println("Turning rule: " + i);
                     if (crossing == -1) {
                         for (int j = 0; j < max; j++) {
-                            arr[i][j] = findTwins(new Rule(mode, i * max + j), w, wrap);
+                            arr[i][j] = findTwins(new Rule(mode, i * max + j), w, bc);
                         }
                     } else {
-                        findTwins(new Rule(mode, i * max + crossing), w, wrap);
+                        findTwins(new Rule(mode, i * max + crossing), w, bc);
                     }
                 }
             } else {
                 if (crossing == -1) {
                     for (int j = 0; j < max; j++) {
-                        findTwins(new Rule(mode, turning * max + j), w, wrap);
+                        findTwins(new Rule(mode, turning * max + j), w, bc);
                     }
                 } else {
-                    findTwins(new Rule(mode, turning * max + crossing), w, wrap);
+                    findTwins(new Rule(mode, turning * max + crossing), w, bc);
                 }
             }
             if(config.getLogging()) {
-                logData("data/Twins/"+ config.getMode()+"/" + w + "_" + wrap + ".csv",arr);
+                logData("data/Twins/"+ config.getMode()+"/" + w + "_" + bc + ".csv",arr);
             }
         }
     }
@@ -137,7 +138,7 @@ public class Main {
         String mode = config.getMode();
         int start = config.getStartWidth();
         int end = config.getEndWidth();
-        boolean wrap = config.getWrapsAround();
+        String bc = config.getBoundaryCondition();
         int crossing = config.getCrossingRule();
         int turning = config.getTurningRule();
         int max = 16;
@@ -146,44 +147,51 @@ public class Main {
         }
         int[][] arr = new int[max][max];
         for(int w = start; w <= end; w++) {
+            System.out.println(w + " " + java.time.LocalTime.now());
             if(turning == -1) {
                 for(int i = 0; i < max; i++) {
+                    System.out.println("Turning rule: " + i);
                     if(crossing == -1) {
                         for(int j = 0; j < max; j++) {
-                            arr[i][j] = findGoEs(new Rule(mode, i*max+j),w,wrap);
+                            arr[i][j] = findGoEs(new Rule(mode, i*max+j),w,bc);
                         }
                     } else {
-                        findGoEs(new Rule(mode, i*max+crossing),w,wrap);
+                        findGoEs(new Rule(mode, i*max+crossing),w,bc);
                     }
                 }
             } else {
                 if(crossing == -1) {
                     for(int j = 0; j < max; j++) {
-                        findGoEs(new Rule(mode, turning*max+j),w,wrap);
+                        findGoEs(new Rule(mode, turning*max+j),w,bc);
                     }
                 } else {
-                    findGoEs(new Rule(mode, turning*max+crossing),w,wrap);
+                    findGoEs(new Rule(mode, turning*max+crossing),w,bc);
                 }
             }
             if(config.getLogging()) {
-                logData("data/GardenOfEden/"+ config.getMode()+"/" + w + "_" + wrap + ".csv",arr);
+                logData("data/GardenOfEden/"+ config.getMode()+"/" + w + "_" + bc + ".csv",arr);
             }
         }
     }
 
-    public static void generatePattern(Rule rule, char[] start, int height) {
+    public static void generatePattern(Rule rule, char[] start, int height, String boundaryCondition) {
         Stack<String> rows = new Stack<>();
-        Row r = new Row(start, rule, true, true);
+        Queue<String> rowsBracelet = new LinkedList<>();
+        Row r = new Row(start, rule, false, boundaryCondition);
         for(int i = 0; i < height; i++) {
             rows.push(r.toString() + "     " + i + "\n");
+            rowsBracelet.add(r.toStringBracelet() + '\n');
             r = r.getSuccessor();
         }
 
         StringBuilder sb = new StringBuilder(rule.toString() + "\n");
+        StringBuilder sb2 = new StringBuilder();
         while(!rows.isEmpty()){
             sb.append(rows.pop());
+            sb2.append(rowsBracelet.remove());
         }
         System.out.println(sb.toString());
+        System.out.println(sb2.toString());
         if(config.getVerbose()) {
             System.out.println("\n"+rule.toDebugString());
         }
@@ -203,12 +211,12 @@ public class Main {
         }
     }
 
-    public static int findTwins(Rule rule, int width, boolean wrapAround) {
+    public static int findTwins(Rule rule, int width, String boundaryCondition) {
         Container<String> configs = new Container<>();
         generateStrings(rule.states, width, "", configs);
         int val = 0;
         for(String s: configs.items) {
-            Row r = new Row(s.toCharArray(), rule, false, wrapAround);
+            Row r = new Row(s.toCharArray(), rule, false, boundaryCondition);
             HashSet<Row> twins = r.findTwins();
 //            if(twins.size() == 1) {
 //                System.out.println(r.toString() + "has no twins under " + rule.toString());
@@ -231,27 +239,25 @@ public class Main {
         return val;
     }
 
-    public static int findGoEs(Rule rule, int width, boolean wrapAround) {
+    public static int findGoEs(Rule rule, int width, String boundaryCondition) {
         Container<String> configs = new Container<>();
         generateStrings(rule.states, width, "", configs);
         ArrayList<Row> goes = new ArrayList<>();
         ArrayList<Row> nonGoes = new ArrayList<>();
         for(String s: configs.items) {
-            Row r = new Row(s.toCharArray(), rule, false, wrapAround);
+            Row r = new Row(s.toCharArray(), rule, false, boundaryCondition);
             if(r.findPredecessors().isEmpty()) {
                 goes.add(r);
             } else {
                 nonGoes.add(r);
             }
         }
-        System.out.println(rule.toString() + " width " + width + " has " + goes.size() + " GoE(s)");
         if(config.getVerbose()) {
+            System.out.println(rule.toString() + " width " + width + " has " + goes.size() + " GoE(s)");
             for(Row r: goes) {
                 System.out.println("  " + r.toString());
             }
-        }
-        System.out.println(rule.toString() + " width " + width + " has " + nonGoes.size() + " non-GoE(s)");
-        if(config.getVerbose()) {
+            System.out.println(rule.toString() + " width " + width + " has " + nonGoes.size() + " non-GoE(s)");
             for(Row r: nonGoes) {
                 System.out.println("  " + r.toString());
             }

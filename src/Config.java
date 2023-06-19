@@ -26,7 +26,6 @@ public class Config {
 
     public String getMode(){
         String input = this.prop.getProperty("mode");
-        //TODO get wolfram mode to work with pattern mode
         String[] vals = new String[]{"full", "simplified", "wolfram"};
         return this.validateParam("mode",input, vals);
     }
@@ -105,6 +104,12 @@ public class Config {
         return 0;
     }
 
+    public String getBoundaryCondition(){
+        String input = this.prop.getProperty("boundaryCondition");
+        String[] vals = new String[]{"wrap", "reflect", "none"};
+        return this.validateParam("boundaryCondition",input, vals);
+    }
+
     //section: pattern experiment params
     public char[] getPatternString() {
         String[] vals = switch (getMode()) {
@@ -164,34 +169,6 @@ public class Config {
             System.exit(1);
         }
         return -1;
-    }
-
-    public boolean getWrapsAround() {
-        String input = this.prop.getProperty("wrapsAround");
-        if(input.equals("true")) {
-            return true;
-        } else if(input.equals("false")) {
-            return false;
-        } else {
-            System.out.println("wrapsAround input must be 'true' or 'false'");
-            System.exit(1);
-        }
-        return false;
-    }
-
-    //section: twin experiment params
-    public String getTwinString() {
-        String[] vals = switch (getMode()) {
-            case ("full") -> new String[]{"SNN", "NNN", "NSN", "UNN", "UUN", "NUN", "SSR", "SSL"};
-            case ("simplified") -> new String[]{"L", "R", "F", "B"};
-            default -> new String[]{"0", "1"};
-        };
-        String input = this.prop.getProperty("twins.configuration");
-        char[] cells = input.toCharArray();
-        for(int i = 0; i < cells.length; i++) {
-            validateParam("twins.configuration cell " + i, ""+cells[i], vals);
-        }
-        return input;
     }
 
     /**
