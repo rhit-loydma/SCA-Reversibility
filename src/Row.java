@@ -46,17 +46,24 @@ public class Row {
     public Row getSuccessor() {
         char[] newCells = new char[this.cells.length];
         String neighborhood;
-        for(int i = 0; i < this.cells.length; i++) {
-            int l, r;
-            if (!parity) { //next row will have parity
-                l = i;
-                r = (i + 1) % this.cells.length;
-            } else {
-                l = (i - 1 + this.cells.length) % this.cells.length;
-                r = i;
+        if(this.wrapAround) {
+            for(int i = 0; i < this.cells.length; i++) {
+                int l, r;
+                if (!parity) { //next row will have parity
+                    l = i;
+                    r = (i + 1) % this.cells.length;
+                } else {
+                    l = (i - 1 + this.cells.length) % this.cells.length;
+                    r = i;
+                }
+                neighborhood = "" + this.cells[l] + this.cells[r];
+                newCells[i] = this.rule.getNext(neighborhood);
             }
-            neighborhood = "" + this.cells[l] + this.cells[r];
-            newCells[i] = this.rule.getNext(neighborhood);
+        } else {
+            for(int i = 0; i < this.cells.length - 1; i++) {
+                neighborhood = "" + this.cells[i] + this.cells[i+1];
+                newCells[i] = this.rule.getNext(neighborhood);
+            }
         }
         return new Row(newCells, rule, !parity, this.wrapAround);
 //            CrossingStatus cs = this.cRule.getStatus(left, right);
@@ -104,9 +111,9 @@ public class Row {
         }
         HashSet<Row> set = new HashSet<>();
         for (String cur : a) {
-            String first = cur.substring(0, 1);
-            String last = cur.substring(cur.length() - 1);
-            if (!this.wrapAround || first.equals(last)) {
+            char first = cur.charAt(0);
+            char last = cur.charAt(cur.length()-1);
+            if (!this.wrapAround || first == last) {
                 String s = cur.substring(0, cur.length() - 1);
                 set.add(new Row(s.toCharArray(), this.rule, !this.parity, this.wrapAround));
             }
@@ -116,8 +123,20 @@ public class Row {
 
     public HashSet<Row> findTwins() {
         Row s = this.getSuccessor();
-        HashSet<Row> set = s.findPredecessors();
-        set.removeIf(r -> Arrays.equals(this.cells, r.cells));
-        return set;
+        return s.findPredecessors();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof Row)) {
+            return false;
+        }
+
+        Row r = (Row) o;
+        return this.cells == r.cells;
     }
 }

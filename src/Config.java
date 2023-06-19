@@ -136,44 +136,44 @@ public class Config {
     }
 
     //section: twin experiment params
-    public int getGoEstartWidth() {
+    public int getStartWidth() {
         try {
-            int input = Integer.parseInt(this.prop.getProperty("goe.startWidth"));
+            int input = Integer.parseInt(this.prop.getProperty("startWidth"));
             if (input < 0) {
-                System.out.println("goe.startWidth input must be greater than 0");
+                System.out.println("startWidth input must be greater than 0");
                 System.exit(1);
             }
             return input;
         } catch(NumberFormatException e) {
-            System.out.println("goe.startWidth input must be an int");
+            System.out.println("startWidth input must be an int");
             System.exit(1);
         }
         return 0;
     }
 
-    public int getGoEendWidth() {
+    public int getEndWidth() {
         try {
-            int input = Integer.parseInt(this.prop.getProperty("goe.endWidth"));
-            if (input < getGoEstartWidth()) {
-                System.out.println("goe.startWidth can't be less than goe.endWidth");
+            int input = Integer.parseInt(this.prop.getProperty("endWidth"));
+            if (input < getStartWidth()) {
+                System.out.println("startWidth can't be less than goe.endWidth");
                 System.exit(1);
             }
             return input;
         } catch(NumberFormatException e) {
-            System.out.println("goe.startWidth input must be an int");
+            System.out.println("startWidth input must be an int");
             System.exit(1);
         }
         return -1;
     }
 
-    public boolean getGoEwrapsAround() {
-        String input = this.prop.getProperty("goe.wrapsAround");
+    public boolean getWrapsAround() {
+        String input = this.prop.getProperty("wrapsAround");
         if(input.equals("true")) {
             return true;
         } else if(input.equals("false")) {
             return false;
         } else {
-            System.out.println("goe.wrapsAround input must be 'true' or 'false'");
+            System.out.println("wrapsAround input must be 'true' or 'false'");
             System.exit(1);
         }
         return false;

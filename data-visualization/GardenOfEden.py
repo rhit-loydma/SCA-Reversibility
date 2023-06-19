@@ -1,7 +1,4 @@
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-from matplotlib import style
-import numpy as np
 
 ROWS = 2
 COLS = 5

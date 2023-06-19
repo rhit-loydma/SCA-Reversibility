@@ -1,8 +1,8 @@
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Main {
     static Config config;
@@ -93,44 +93,51 @@ public class Main {
     }
 
     public static void twinsMode() {
-        char[] cells = config.getTwinString().toCharArray();
+        String mode = config.getMode();
+        int start = config.getStartWidth();
+        int end = config.getEndWidth();
+        boolean wrap = config.getWrapsAround();
         int crossing = config.getCrossingRule();
         int turning = config.getTurningRule();
+
         int max = 16;
-        String mode = config.getMode();
         if(mode.equals("full")) {
             max = 512;
         }
         int[][] arr = new int[max][max];
-        if(turning == -1) {
-            for(int i = 0; i < max; i++) {
-                if(crossing == -1) {
-                    for(int j = 0; j < max; j++) {
-                        arr[i][j] = findTwins(new Rule(mode, i*max + j), cells);
+        for(int w = start; w <= end; w++) {
+            System.out.println(w + " " + java.time.LocalTime.now());
+            if (turning == -1) {
+                for (int i = 0; i < max; i++) {
+                    System.out.println("Turning rule: " + i);
+                    if (crossing == -1) {
+                        for (int j = 0; j < max; j++) {
+                            arr[i][j] = findTwins(new Rule(mode, i * max + j), w, wrap);
+                        }
+                    } else {
+                        findTwins(new Rule(mode, i * max + crossing), w, wrap);
                     }
-                } else {
-                    findTwins(new Rule(mode, i*max + crossing), cells);
-                }
-            }
-        } else {
-            if(crossing == -1) {
-                for(int j = 0; j < max; j++) {
-                    findTwins(new Rule(mode, turning*max + j), cells);
                 }
             } else {
-                findTwins(new Rule(mode, turning*max + crossing), cells);
+                if (crossing == -1) {
+                    for (int j = 0; j < max; j++) {
+                        findTwins(new Rule(mode, turning * max + j), w, wrap);
+                    }
+                } else {
+                    findTwins(new Rule(mode, turning * max + crossing), w, wrap);
+                }
             }
-        }
-        if(config.getLogging()) {
-            logData("data/Twins/"+ config.getMode()+"/" + config.getTwinString() + ".csv",arr);
+            if(config.getLogging()) {
+                logData("data/Twins/"+ config.getMode()+"/" + w + "_" + wrap + ".csv",arr);
+            }
         }
     }
 
     public static void GoEMode() {
         String mode = config.getMode();
-        int start = config.getGoEstartWidth();
-        int end = config.getGoEendWidth();
-        boolean wrap = config.getGoEwrapsAround();
+        int start = config.getStartWidth();
+        int end = config.getEndWidth();
+        boolean wrap = config.getWrapsAround();
         int crossing = config.getCrossingRule();
         int turning = config.getTurningRule();
         int max = 16;
@@ -139,7 +146,6 @@ public class Main {
         }
         int[][] arr = new int[max][max];
         for(int w = start; w <= end; w++) {
-            System.out.println(w);
             if(turning == -1) {
                 for(int i = 0; i < max; i++) {
                     if(crossing == -1) {
@@ -160,7 +166,7 @@ public class Main {
                 }
             }
             if(config.getLogging()) {
-                logData("data/GardenOfEden/"+ config.getMode()+"/" + w + "_" + config.getGoEwrapsAround() + ".csv",arr);
+                logData("data/GardenOfEden/"+ config.getMode()+"/" + w + "_" + wrap + ".csv",arr);
             }
         }
     }
@@ -197,23 +203,32 @@ public class Main {
         }
     }
 
-    public static int findTwins(Rule rule, char[] cells) {
-        Row r = new Row(cells, rule, false, true);
-        HashSet<Row> twins = r.findTwins();
-        if(twins.size() == 0){
-            System.out.println(r.toString() + "has no twins under " + rule.toString());
-        } else {
-            System.out.println(r.toString() + "under rule " + rule.toString() + " has " + twins.size() + " twin(s)");
-            if(config.getVerbose()){
-                for(Row t: twins) {
-                    System.out.println("  " + t.toString());
-                }
+    public static int findTwins(Rule rule, int width, boolean wrapAround) {
+        Container<String> configs = new Container<>();
+        generateStrings(rule.states, width, "", configs);
+        int val = 0;
+        for(String s: configs.items) {
+            Row r = new Row(s.toCharArray(), rule, false, wrapAround);
+            HashSet<Row> twins = r.findTwins();
+//            if(twins.size() == 1) {
+//                System.out.println(r.toString() + "has no twins under " + rule.toString());
+//            } else {
+//                System.out.println(r.toString() + "under rule " + rule.toString() + " has " + twins.size() + " twin(s)");
+//                if(config.getVerbose()){
+//                    for(Row t: twins) {
+//                        System.out.println("  " + t.toString());
+//                    }
+//                }
+//                val++;
+//            }
+            if(r.findTwins().size() > 1) {
+                val++;
             }
         }
         if(config.getVerbose()) {
             System.out.println("\n"+rule.toDebugString());
         }
-        return twins.size();
+        return val;
     }
 
     public static int findGoEs(Rule rule, int width, boolean wrapAround) {
