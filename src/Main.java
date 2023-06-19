@@ -39,8 +39,10 @@ public class Main {
         }
         if(turning == -1) {
             for(int i = 0; i < max; i++) {
+                outputMessage("Turning Rule: " + i, 2);
                 if(crossing == -1) {
                     for(int j = 0; j < max; j++) {
+                        outputMessage("Crossing Rule: " + j, 3);
                         generatePattern(new Rule(mode, i*max + j), start, height, bc);
                     }
                 } else {
@@ -48,11 +50,14 @@ public class Main {
                 }
             }
         } else {
+            outputMessage("Turning Rule: " + turning, 2);
             if(crossing == -1) {
                 for(int j = 0; j < max; j++) {
+                    outputMessage("Crossing Rule: " + j, 3);
                     generatePattern(new Rule(mode, turning*max + j), start, height, bc);
                 }
             } else {
+                outputMessage("Crossing Rule: " + crossing, 3);
                 generatePattern(new Rule(mode, turning*max + crossing), start, height, bc);
             }
         }
@@ -70,20 +75,26 @@ public class Main {
         int turning = config.getTurningRule();
         if(turning == -1) {
             for(int i = 0; i < max; i++) {
+                outputMessage("Turning Rule: " + i, 2);
                 if(crossing == -1) {
                     for(int j = 0; j < max; j++) {
+                        outputMessage("Crossing Rule: " + j, 3);
                         arr[i][j] = checkSurjective(new Rule(mode, i*max+j));
                     }
                 } else {
+                    outputMessage("Crossing Rule: " + crossing, 3);
                     checkSurjective(new Rule(mode, i*max+crossing));
                 }
             }
         } else {
+            outputMessage("Turning Rule: " + turning, 2);
             if(crossing == -1) {
                 for(int j = 0; j < max; j++) {
+                    outputMessage("Crossing Rule: " + j, 3);
                     checkSurjective(new Rule(mode, turning*max+j));
                 }
             } else {
+                outputMessage("Crossing Rule: " + crossing, 3);
                 checkSurjective(new Rule(mode, turning*max+crossing));
             }
         }
@@ -107,24 +118,29 @@ public class Main {
         }
         int[][] arr = new int[max][max];
         for(int w = start; w <= end; w++) {
-            System.out.println(w + " " + java.time.LocalTime.now());
+            outputMessage(w + " " + java.time.LocalTime.now(), 1);
             if (turning == -1) {
                 for (int i = 0; i < max; i++) {
-                    System.out.println("Turning rule: " + i);
+                    outputMessage("Turning Rule: " + i, 2);
                     if (crossing == -1) {
                         for (int j = 0; j < max; j++) {
+                            outputMessage("Crossing Rule: " + j, 3);
                             arr[i][j] = findTwins(new Rule(mode, i * max + j), w, bc);
                         }
                     } else {
+                        outputMessage("Crossing Rule: " + crossing, 3);
                         findTwins(new Rule(mode, i * max + crossing), w, bc);
                     }
                 }
             } else {
+                outputMessage("Turning Rule: " + turning, 2);
                 if (crossing == -1) {
                     for (int j = 0; j < max; j++) {
+                        outputMessage("Crossing Rule: " + j, 3);
                         findTwins(new Rule(mode, turning * max + j), w, bc);
                     }
                 } else {
+                    outputMessage("Crossing Rule: " + crossing, 3);
                     findTwins(new Rule(mode, turning * max + crossing), w, bc);
                 }
             }
@@ -147,24 +163,29 @@ public class Main {
         }
         int[][] arr = new int[max][max];
         for(int w = start; w <= end; w++) {
-            System.out.println(w + " " + java.time.LocalTime.now());
+            outputMessage(w + " " + java.time.LocalTime.now(), 1);
             if(turning == -1) {
                 for(int i = 0; i < max; i++) {
-                    System.out.println("Turning rule: " + i);
+                    outputMessage("Turning Rule: " + i, 2);
                     if(crossing == -1) {
                         for(int j = 0; j < max; j++) {
+                            outputMessage("Crossing Rule: " + j, 3);
                             arr[i][j] = findGoEs(new Rule(mode, i*max+j),w,bc);
                         }
                     } else {
+                        outputMessage("Crossing Rule: " + crossing, 3);
                         findGoEs(new Rule(mode, i*max+crossing),w,bc);
                     }
                 }
             } else {
+                outputMessage("Turning Rule: " + turning, 2);
                 if(crossing == -1) {
                     for(int j = 0; j < max; j++) {
+                        outputMessage("Crossing Rule: " + j, 3);
                         findGoEs(new Rule(mode, turning*max+j),w,bc);
                     }
                 } else {
+                    outputMessage("Crossing Rule: " + crossing, 3);
                     findGoEs(new Rule(mode, turning*max+crossing),w,bc);
                 }
             }
@@ -191,22 +212,18 @@ public class Main {
             sb2.append(rowsBracelet.remove());
         }
         System.out.println(sb.toString());
-        System.out.println(sb2.toString());
-        if(config.getVerbose()) {
-            System.out.println("\n"+rule.toDebugString());
-        }
+        outputMessage(sb2.toString(), 1);
+        outputMessage("\n"+rule.toDebugString(), 4);
     }
 
     public static int checkSurjective(Rule rule) {
-        if(config.getVerbose()) {
-            System.out.println("\n"+rule.toDebugString());
-        }
+        outputMessage("\n"+rule.toDebugString(), 4);
         Node n = new Node(rule);
         if(n.isSurjective()) {
             System.out.println("Rule " + rule.number + " is surjective");
             return 1;
         } else {
-            System.out.println("Rule " + rule.number + " is not surjective");
+            outputMessage("Rule " + rule.number + " is not surjective", 1);
             return 0;
         }
     }
@@ -214,29 +231,24 @@ public class Main {
     public static int findTwins(Rule rule, int width, String boundaryCondition) {
         Container<String> configs = new Container<>();
         generateStrings(rule.states, width, "", configs);
-        int val = 0;
+        double val = 0;
         for(String s: configs.items) {
             Row r = new Row(s.toCharArray(), rule, false, boundaryCondition);
-            HashSet<Row> twins = r.findTwins();
+//            HashSet<Row> twins = r.findTwins();
 //            if(twins.size() == 1) {
-//                System.out.println(r.toString() + "has no twins under " + rule.toString());
+//                outputMessage(r.toString() + "has no twins under " + rule.toString(), 4);
 //            } else {
-//                System.out.println(r.toString() + "under rule " + rule.toString() + " has " + twins.size() + " twin(s)");
-//                if(config.getVerbose()){
-//                    for(Row t: twins) {
-//                        System.out.println("  " + t.toString());
-//                    }
+//                outputMessage(r.toString() + "under rule " + rule.toString() + " has " + twins.size() + " twin(s)", 4);
+//                for(Row t: twins) {
+//                    outputMessage("  " + t.toString(), 5);
 //                }
 //                val++;
 //            }
-            if(r.findTwins().size() > 1) {
-                val++;
-            }
+            val += r.numTwins();
         }
-        if(config.getVerbose()) {
-            System.out.println("\n"+rule.toDebugString());
-        }
-        return val;
+        outputMessage("\n"+rule.toDebugString(), 4);
+        System.out.println(val);
+        return (int) val;
     }
 
     public static int findGoEs(Rule rule, int width, String boundaryCondition) {
@@ -252,17 +264,15 @@ public class Main {
                 nonGoes.add(r);
             }
         }
-        if(config.getVerbose()) {
-            System.out.println(rule.toString() + " width " + width + " has " + goes.size() + " GoE(s)");
-            for(Row r: goes) {
-                System.out.println("  " + r.toString());
-            }
-            System.out.println(rule.toString() + " width " + width + " has " + nonGoes.size() + " non-GoE(s)");
-            for(Row r: nonGoes) {
-                System.out.println("  " + r.toString());
-            }
-            System.out.println("\n"+rule.toDebugString());
+        outputMessage(rule.toString() + " width " + width + " has " + goes.size() + " GoE(s)", 4);
+        for(Row r: goes) {
+            outputMessage("  " + r.toString(), 5);
         }
+        outputMessage(rule.toString() + " width " + width + " has " + nonGoes.size() + " non-GoE(s)", 4);
+        for(Row r: nonGoes) {
+            outputMessage("  " + r.toString(), 5);;
+        }
+        outputMessage("\n"+rule.toDebugString(), 4);
         return goes.size();
     }
 
@@ -293,6 +303,12 @@ public class Main {
             file.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void outputMessage(String msg, int level) {
+        if(config.getOutputLevel() >= level) {
+            System.out.println(msg);
         }
     }
 }

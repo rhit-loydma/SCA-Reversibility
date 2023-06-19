@@ -179,11 +179,25 @@ public class Row {
         }
         HashSet<Row> set = new HashSet<>();
         for (String cur : a) {
-            char first = cur.charAt(0);
-            char last = cur.charAt(cur.length()-1);
-            if (!(this.bc.equals("wrap")) || first == last) {
-                String s = cur.substring(0, cur.length() - 1);
-                set.add(new Row(s.toCharArray(), this.rule, !this.parity, this.bc));
+            if(this.bc.equals("wrap")) {
+                char first = cur.charAt(0);
+                char last = cur.charAt(cur.length()-1);
+                if(first == last) {
+                    String s = cur.substring(0, cur.length() - 1);
+                    set.add(new Row(s.toCharArray(), this.rule, !this.parity, this.bc));
+                }
+            } else if (this.bc.equals("reflect")) {
+                char first = cur.charAt(0);
+                char second = cur.charAt(1);
+
+                char last = cur.charAt(cur.length() - 1);
+                char secondLast = cur.charAt(cur.length() - 2);
+
+                if(first == getReflectedCell(second) && last == getReflectedCell(secondLast)) {
+                    set.add(new Row(cur.substring(1,cur.length()-1).toCharArray(), this.rule, !this.parity, this.bc));
+                }
+            } else {
+                set.add(new Row(cur.toCharArray(), this.rule, !this.parity, this.bc));
             }
         }
         return set;
@@ -192,6 +206,11 @@ public class Row {
     public HashSet<Row> findTwins() {
         Row s = this.getSuccessor();
         return s.findPredecessors();
+    }
+
+    public double numTwins() {
+        int size = this.findTwins().size();
+        return (double) (size - 1) / size;
     }
 
     @Override

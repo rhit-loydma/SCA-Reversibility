@@ -30,17 +30,19 @@ public class Config {
         return this.validateParam("mode",input, vals);
     }
 
-    public boolean getVerbose() {
-        String input = this.prop.getProperty("verbose");
-        if(input.equals("true")) {
-            return true;
-        } else if(input.equals("false")) {
-            return false;
-        } else {
-            System.out.println("verbose input must be 'true' or 'false'");
+    public int getOutputLevel() {
+        try {
+            int input = Integer.parseInt(this.prop.getProperty("outputLevel"));
+            if (input < 0 || input > 5) {
+                System.out.println("outputLevel input must be between 0 and 5");
+                System.exit(1);
+            }
+            return input;
+        } catch(NumberFormatException e) {
+            System.out.println("outputLevel input must be an int");
             System.exit(1);
         }
-        return false;
+        return 5;
     }
 
     public boolean getLogging() {
