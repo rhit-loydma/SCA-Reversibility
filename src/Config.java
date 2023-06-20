@@ -142,7 +142,20 @@ public class Config {
         return 0;
     }
 
-    //section: twin experiment params
+    //section: twin, GoE experiment params
+    public boolean getParity() {
+        String input = this.prop.getProperty("parity");
+        if(input.equals("true")) {
+            return true;
+        } else if(input.equals("false")) {
+            return false;
+        } else {
+            System.out.println("logging input must be 'true' or 'false'");
+            System.exit(1);
+        }
+        return false;
+    }
+
     public int getStartWidth() {
         try {
             int input = Integer.parseInt(this.prop.getProperty("startWidth"));

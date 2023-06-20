@@ -111,6 +111,7 @@ public class Main {
         String bc = config.getBoundaryCondition();
         int crossing = config.getCrossingRule();
         int turning = config.getTurningRule();
+        boolean parity = config.getParity();
 
         int max = 16;
         if(mode.equals("full")) {
@@ -125,11 +126,11 @@ public class Main {
                     if (crossing == -1) {
                         for (int j = 0; j < max; j++) {
                             outputMessage("Crossing Rule: " + j, 3);
-                            arr[i][j] = findTwins(new Rule(mode, i * max + j), w, bc);
+                            arr[i][j] = findTwins(new Rule(mode, i * max + j), w, bc, parity);
                         }
                     } else {
                         outputMessage("Crossing Rule: " + crossing, 3);
-                        findTwins(new Rule(mode, i * max + crossing), w, bc);
+                        findTwins(new Rule(mode, i * max + crossing), w, bc, parity);
                     }
                 }
             } else {
@@ -137,15 +138,19 @@ public class Main {
                 if (crossing == -1) {
                     for (int j = 0; j < max; j++) {
                         outputMessage("Crossing Rule: " + j, 3);
-                        findTwins(new Rule(mode, turning * max + j), w, bc);
+                        findTwins(new Rule(mode, turning * max + j), w, bc, parity);
                     }
                 } else {
                     outputMessage("Crossing Rule: " + crossing, 3);
-                    findTwins(new Rule(mode, turning * max + crossing), w, bc);
+                    findTwins(new Rule(mode, turning * max + crossing), w, bc, parity);
                 }
             }
             if(config.getLogging()) {
-                logData("data/Twins/"+ config.getMode()+"/" + w + "_" + bc + ".csv",arr);
+                if(bc.equals("reflect")) {
+                    logData("data/Twins/"+ config.getMode()+"/" + w + "_" + bc + "_" + parity + ".csv",arr);
+                } else {
+                    logData("data/Twins/"+ config.getMode()+"/" + w + "_" + bc + ".csv",arr);
+                }
             }
         }
     }
@@ -157,6 +162,7 @@ public class Main {
         String bc = config.getBoundaryCondition();
         int crossing = config.getCrossingRule();
         int turning = config.getTurningRule();
+        boolean parity = config.getParity();
         int max = 16;
         if(mode.equals("full")) {
             max = 512;
@@ -170,11 +176,11 @@ public class Main {
                     if(crossing == -1) {
                         for(int j = 0; j < max; j++) {
                             outputMessage("Crossing Rule: " + j, 3);
-                            arr[i][j] = findGoEs(new Rule(mode, i*max+j),w,bc);
+                            arr[i][j] = findGoEs(new Rule(mode, i*max+j),w,bc, parity);
                         }
                     } else {
                         outputMessage("Crossing Rule: " + crossing, 3);
-                        findGoEs(new Rule(mode, i*max+crossing),w,bc);
+                        findGoEs(new Rule(mode, i*max+crossing),w,bc, parity);
                     }
                 }
             } else {
@@ -182,15 +188,19 @@ public class Main {
                 if(crossing == -1) {
                     for(int j = 0; j < max; j++) {
                         outputMessage("Crossing Rule: " + j, 3);
-                        findGoEs(new Rule(mode, turning*max+j),w,bc);
+                        findGoEs(new Rule(mode, turning*max+j),w,bc, parity);
                     }
                 } else {
                     outputMessage("Crossing Rule: " + crossing, 3);
-                    findGoEs(new Rule(mode, turning*max+crossing),w,bc);
+                    findGoEs(new Rule(mode, turning*max+crossing),w,bc, parity);
                 }
             }
             if(config.getLogging()) {
-                logData("data/GardenOfEden/"+ config.getMode()+"/" + w + "_" + bc + ".csv",arr);
+                if(bc.equals("reflect")) {
+                    logData("data/GardenOfEden/"+ config.getMode()+"/" + w + "_" + bc + "_" + parity + ".csv",arr);
+                } else {
+                    logData("data/GardenOfEden/"+ config.getMode()+"/" + w + "_" + bc + ".csv",arr);
+                }
             }
         }
     }
@@ -228,12 +238,12 @@ public class Main {
         }
     }
 
-    public static int findTwins(Rule rule, int width, String boundaryCondition) {
+    public static int findTwins(Rule rule, int width, String boundaryCondition, boolean parity) {
         Container<String> configs = new Container<>();
         generateStrings(rule.states, width, "", configs);
         double val = 0;
         for(String s: configs.items) {
-            Row r = new Row(s.toCharArray(), rule, false, boundaryCondition);
+            Row r = new Row(s.toCharArray(), rule, parity, boundaryCondition);
 //            HashSet<Row> twins = r.findTwins();
 //            if(twins.size() == 1) {
 //                outputMessage(r.toString() + "has no twins under " + rule.toString(), 4);
@@ -247,17 +257,16 @@ public class Main {
             val += r.numTwins();
         }
         outputMessage("\n"+rule.toDebugString(), 4);
-        System.out.println(val);
         return (int) val;
     }
 
-    public static int findGoEs(Rule rule, int width, String boundaryCondition) {
+    public static int findGoEs(Rule rule, int width, String boundaryCondition, boolean parity) {
         Container<String> configs = new Container<>();
         generateStrings(rule.states, width, "", configs);
         ArrayList<Row> goes = new ArrayList<>();
         ArrayList<Row> nonGoes = new ArrayList<>();
         for(String s: configs.items) {
-            Row r = new Row(s.toCharArray(), rule, false, boundaryCondition);
+            Row r = new Row(s.toCharArray(), rule, parity, boundaryCondition);
             if(r.findPredecessors().isEmpty()) {
                 goes.add(r);
             } else {

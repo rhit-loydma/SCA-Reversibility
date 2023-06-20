@@ -186,7 +186,7 @@ public class Row {
                     String s = cur.substring(0, cur.length() - 1);
                     set.add(new Row(s.toCharArray(), this.rule, !this.parity, this.bc));
                 }
-            } else if (this.bc.equals("reflect")) {
+            } else if (this.bc.equals("reflect") && !this.parity) {
                 char first = cur.charAt(0);
                 char second = cur.charAt(1);
 
@@ -205,6 +205,7 @@ public class Row {
 
     public HashSet<Row> findTwins() {
         Row s = this.getSuccessor();
+        System.out.println(s.toString());
         return s.findPredecessors();
     }
 
