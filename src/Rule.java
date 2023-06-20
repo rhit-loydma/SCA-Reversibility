@@ -12,7 +12,7 @@ public class Rule {
     public static final char NNN = '_';
     public static final char NSN = '\\';
     public static final char UNN = '[';//'\u23b8';
-    public static final char UUN = 'H';//'\u2016';
+    public static final char UUN = 'U';//'\u2016';
     public static final char NUN = ']';//'\u23b9';
     public static final char SSR = 'R';
     public static final char SSL = 'L';
@@ -24,9 +24,9 @@ public class Rule {
         this.max = 16;
         switch (mode) {
             case ("wolfram") -> generateRuleMapWolfram();
-            case ("full") -> {
+            case ("expanded") -> {
                 max = 512;
-                generateRuleMapFull();
+                generateRuleMapExpanded();
             }
             default -> generateRuleMapCrossing();
         }
@@ -76,8 +76,8 @@ public class Rule {
         };
     }
 
-    public void generateRuleMapFull() {
-        generateFullStates();
+    public void generateRuleMapExpanded() {
+        generateExpandedStates();
 
         String crossing = Integer.toString(this.number%max, 2);
         crossing = "0".repeat(9 - crossing.length()) + crossing;
@@ -93,8 +93,8 @@ public class Rule {
                 int rightC = getCrossingStatusRight(right);
                 int rightT = getTurningStatus(right);
                 //use those to calculate indexes
-                int crossingIndex = 3 * leftC + rightC;
-                int turningIndex = 3 * leftT + rightT;
+                int crossingIndex = 8-(3 * leftC + rightC);
+                int turningIndex = 8-(3 * leftT + rightT);
                 //take binary strings reps of rules, get char at index
                 int c = crossing.charAt(crossingIndex)-'0';
                 int t = turning.charAt(turningIndex)-'0';
@@ -116,12 +116,12 @@ public class Rule {
                     c = -1;
                 }
 
-                map.put("" + left + right, getOutputFull(l,r,c));
+                map.put("" + left + right, getOutputExpanded(l,r,c));
             }
         }
     }
 
-    public void generateFullStates() {
+    public void generateExpandedStates() {
         states.add(SNN);
         states.add(NNN);
         states.add(NSN);
@@ -143,19 +143,19 @@ public class Rule {
         return switch (cell) {
             case SSR -> 2;
             case SSL -> 0;
-            default -> 1; //no
+            default -> 1;
         };
     }
 
     public static int getTurningStatus(char cell) {
         return switch (cell) {
-            case NNN -> 0;
-            case UNN, NUN, UUN -> 1;
-            default -> 2; //slanted
+            case NNN -> 1;
+            case UNN, NUN, UUN -> 2;
+            default -> 0; //slanted
         };
     }
 
-    public static char getOutputFull(int leftTurning, int rightTurning, int crossing) {
+    public static char getOutputExpanded(int leftTurning, int rightTurning, int crossing) {
         switch (crossing) {
             case 1 -> {return SSL;}
             case 0 -> {return SSR;}

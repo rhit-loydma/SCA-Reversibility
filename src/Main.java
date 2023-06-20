@@ -34,7 +34,7 @@ public class Main {
         String bc = config.getBoundaryCondition();
         int max = 16;
         String mode = config.getMode();
-        if(mode.equals("full")) {
+        if(mode.equals("expanded")) {
             max = 512;
         }
         if(turning == -1) {
@@ -66,7 +66,7 @@ public class Main {
     public static void surjectiveMode() {
         int max = 16;
         String mode = config.getMode();
-        if(mode.equals("full")) {
+        if(mode.equals("expanded")) {
             max = 512;
         }
         int[][] arr = new int[max][max];
@@ -114,7 +114,7 @@ public class Main {
         boolean parity = config.getParity();
 
         int max = 16;
-        if(mode.equals("full")) {
+        if(mode.equals("expanded")) {
             max = 512;
         }
         int[][] arr = new int[max][max];
@@ -164,7 +164,7 @@ public class Main {
         int turning = config.getTurningRule();
         boolean parity = config.getParity();
         int max = 16;
-        if(mode.equals("full")) {
+        if(mode.equals("expanded")) {
             max = 512;
         }
         int[][] arr = new int[max][max];

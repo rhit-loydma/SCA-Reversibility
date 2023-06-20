@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 ROWS = 2
 COLS = 3
 MODE = "simplified"
-BC = "reflect_false"
+BC = "none"
 
 fig = plt.figure(figsize=(7,6))
     
@@ -18,7 +18,7 @@ for i in range(1, ROWS * COLS + 1):
     for line in lines:
         if len(line) > 1:
             pts = line.split(',')
-            collections.append(list(map(lambda x: float(x)//(0.01*pow(4,i)), pts)))
+            collections.append(list(map(lambda x: float(x)//(0.04*pow(4,i)), pts)))
 
     axs.append(fig.add_subplot(ROWS, COLS, i))
     axs[i-1].imshow(collections, origin='lower', cmap=plt.colormaps['BuPu'], vmin=0, vmax=100)

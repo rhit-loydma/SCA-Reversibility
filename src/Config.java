@@ -26,7 +26,7 @@ public class Config {
 
     public String getMode(){
         String input = this.prop.getProperty("mode");
-        String[] vals = new String[]{"full", "simplified", "wolfram"};
+        String[] vals = new String[]{"expanded", "simplified", "wolfram"};
         return this.validateParam("mode",input, vals);
     }
 
@@ -66,7 +66,7 @@ public class Config {
         try {
             int input = Integer.parseInt(this.prop.getProperty("turningRule"));
             int max = 15;
-            if(getMode().equals("full")) {
+            if(getMode().equals("expanded")) {
                 max = 511;
             }
             if (input < 0 || input > max) {
@@ -88,7 +88,7 @@ public class Config {
         try {
             int input = Integer.parseInt(this.prop.getProperty("crossingRule"));
             int max = 15;
-            if(getMode().equals("full")) {
+            if(getMode().equals("expanded")) {
                 max = 511;
             }
             if (input < 0 || input > max) {
@@ -115,7 +115,7 @@ public class Config {
     //section: pattern experiment params
     public char[] getPatternString() {
         String[] vals = switch (getMode()) {
-            case ("full") -> new String[]{Rule.SNN + "", Rule.NNN + "", Rule.NSN + "",
+            case ("expanded") -> new String[]{Rule.SNN + "", Rule.NNN + "", Rule.NSN + "",
                     Rule.UNN + "", Rule.UUN + "", Rule.NUN + "",
                     Rule.SSR + "", Rule.SSL + ""};
             case ("simplified") -> new String[]{"L", "R", "F", "B"};
