@@ -285,7 +285,7 @@ public class Main {
         return goes.size();
     }
 
-    public static void generateStrings(HashSet<Character> states, int width, String path, Container<String> configs) {
+    public static void generateStrings(ArrayList<Character> states, int width, String path, Container<String> configs) {
         if(width <= 0) {
             configs.add(path);
             return;

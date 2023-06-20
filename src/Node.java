@@ -4,7 +4,7 @@ public class Node {
     Set<String> neighborhoods;
     char b;
     HashMap<Character, Node> children;
-    HashSet<Character> states;
+    ArrayList<Character> states;
     boolean frontier;
 
     public Node(Rule rule) {

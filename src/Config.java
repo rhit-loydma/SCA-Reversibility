@@ -115,7 +115,9 @@ public class Config {
     //section: pattern experiment params
     public char[] getPatternString() {
         String[] vals = switch (getMode()) {
-            case ("full") -> new String[]{"SNN", "NNN", "NSN", "UNN", "UUN", "NUN", "SSR", "SSL"};
+            case ("full") -> new String[]{Rule.SNN + "", Rule.NNN + "", Rule.NSN + "",
+                    Rule.UNN + "", Rule.UUN + "", Rule.NUN + "",
+                    Rule.SSR + "", Rule.SSL + ""};
             case ("simplified") -> new String[]{"L", "R", "F", "B"};
             default -> new String[]{"0", "1"};
         };

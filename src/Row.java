@@ -63,25 +63,6 @@ public class Row {
             case "reflect" -> this.getSuccessorReflect();
             default -> this.getSuccessorNone();
         };
-//            CrossingStatus cs = this.cRule.getStatus(left, right);
-//            TurningStatus ts = this.tRule.getStatus(left, right);
-//
-//            // if there is no left thread, there should be no left turning status
-//            TurningStatus lts = ts;
-//            if (!(left.left == TurningStatus.SLANTED || left.right == TurningStatus.UPRIGHT)) {
-//                lts = TurningStatus.NO;
-//            }
-//
-//            // if there is no right thread, there should be no right turning status
-//            TurningStatus rts = ts;
-//            if (!(right.right == TurningStatus.SLANTED || right.left == TurningStatus.UPRIGHT)) {
-//                rts = TurningStatus.NO;
-//            }
-//
-//            // if there is no cross (2 slanted threads), then there should be no crossing status
-//            if(!(lts == TurningStatus.SLANTED && rts == TurningStatus.SLANTED)) {
-//                cs = CrossingStatus.NO;
-//            }
     }
 
     public Row getSuccessorWrap() {
