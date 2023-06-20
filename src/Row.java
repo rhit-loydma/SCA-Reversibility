@@ -144,7 +144,7 @@ public class Row {
     }
 
     public Row getSuccessorNone() {
-        char[] newCells = new char[this.cells.length];
+        char[] newCells = new char[this.cells.length - 1];
 
         String neighborhood;
         for(int i = 0; i < this.cells.length - 1; i++) {
