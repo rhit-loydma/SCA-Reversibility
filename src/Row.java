@@ -205,7 +205,6 @@ public class Row {
 
     public HashSet<Row> findTwins() {
         Row s = this.getSuccessor();
-        System.out.println(s.toString());
         return s.findPredecessors();
     }
 
