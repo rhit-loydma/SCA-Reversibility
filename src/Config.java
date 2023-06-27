@@ -188,6 +188,28 @@ public class Config {
         return -1;
     }
 
+    public int getCountingMethod() {
+        String input = this.prop.getProperty("twins.countingMethod");
+        try {
+            int number = Integer.parseInt(input);
+            if (number < 1) {
+                System.out.println("The twins counting method must be 'surjective', 'redundant', or an int greater than 0");
+                System.exit(1);
+            }
+            return number;
+        } catch(NumberFormatException e) {
+            switch (input) {
+                case "surjective" -> { return -2; }
+                case "redundant" -> { return -1; }
+                default -> {
+                    System.out.println("The twins counting method must be 'surjective', 'redundant', or an int greater than 0");
+                    System.exit(1);
+                }
+            }
+        }
+        return 0;
+    }
+
     /**
      * Validates string input against an array of possible values
      * Stops the program if a bad value is inserted

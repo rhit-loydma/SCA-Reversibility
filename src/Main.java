@@ -112,6 +112,7 @@ public class Main {
         int crossing = config.getCrossingRule();
         int turning = config.getTurningRule();
         boolean parity = config.getParity();
+        int method = config.getCountingMethod();
 
         int max = 16;
         if(mode.equals("expanded")) {
@@ -126,11 +127,11 @@ public class Main {
                     if (crossing == -1) {
                         for (int j = 0; j < max; j++) {
                             outputMessage("Crossing Rule: " + j, 3);
-                            arr[i][j] = findTwins(new Rule(mode, i * max + j), w, bc, parity);
+                            arr[i][j] = findTwins(new Rule(mode, i * max + j), w, bc, parity, method);
                         }
                     } else {
                         outputMessage("Crossing Rule: " + crossing, 3);
-                        findTwins(new Rule(mode, i * max + crossing), w, bc, parity);
+                        findTwins(new Rule(mode, i * max + crossing), w, bc, parity, method);
                     }
                 }
             } else {
@@ -138,18 +139,27 @@ public class Main {
                 if (crossing == -1) {
                     for (int j = 0; j < max; j++) {
                         outputMessage("Crossing Rule: " + j, 3);
-                        findTwins(new Rule(mode, turning * max + j), w, bc, parity);
+                        findTwins(new Rule(mode, turning * max + j), w, bc, parity, method);
                     }
                 } else {
                     outputMessage("Crossing Rule: " + crossing, 3);
-                    findTwins(new Rule(mode, turning * max + crossing), w, bc, parity);
+                    findTwins(new Rule(mode, turning * max + crossing), w, bc, parity, method);
                 }
+            }
+            String m;
+            switch(method) {
+                case -2 -> {m = "surjective";}
+                case -1 -> {m = "redundant";}
+                case 2 -> {m = "twins";}
+                case 3 -> {m = "triplets";}
+                case 4-> {m = "quadruplets";}
+                default -> {m = String.valueOf(method);}
             }
             if(config.getLogging()) {
                 if(bc.equals("reflect")) {
-                    logData("data/Twins/"+ config.getMode()+"/" + w + "_" + bc + "_" + parity + ".csv",arr);
+                    logData("data/Twins/"+ config.getMode()+"/" + w + "_" + bc + "_" + parity + "_" + m + ".csv",arr);
                 } else {
-                    logData("data/Twins/"+ config.getMode()+"/" + w + "_" + bc + ".csv",arr);
+                    logData("data/Twins/"+ config.getMode()+"/" + w + "_" + bc + "_" + m + ".csv",arr);
                 }
             }
         }
@@ -238,7 +248,7 @@ public class Main {
         }
     }
 
-    public static int findTwins(Rule rule, int width, String boundaryCondition, boolean parity) {
+    public static int findTwins(Rule rule, int width, String boundaryCondition, boolean parity, int method) {
         Container<String> configs = new Container<>();
         generateStrings(rule.states, width, "", configs);
         double val = 0;
@@ -254,7 +264,7 @@ public class Main {
 //                }
 //                val++;
 //            }
-            val += r.numTwins();
+            val += r.numTwins(method);
         }
         outputMessage("\n"+rule.toDebugString(), 4);
         return (int) val;

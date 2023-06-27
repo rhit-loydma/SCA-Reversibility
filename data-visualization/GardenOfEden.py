@@ -27,4 +27,4 @@ for i in range(1, ROWS * COLS + 1):
 fig.tight_layout()
 plt.suptitle("Garden of Edens\nMode: " + MODE + "   Boundary Condition: " + BC + "\n",fontsize=16,y=1)
 # plt.suptitle("Garden of Edens\nMode: " + MODE + "   Boundary Condition: reflect   Parity: true\n",fontsize=16,y=1)
-plt.show()
+plt.show()  

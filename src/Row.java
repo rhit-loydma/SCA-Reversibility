@@ -189,9 +189,33 @@ public class Row {
         return s.findPredecessors();
     }
 
-    public double numTwins() {
+    public double numTwins(int method) {
+        switch(method) {
+            case -2 -> { return numTwinsSurjective(); }
+            case -1 -> { return numTwinsRedundant(); }
+            default -> { return numTwinsMultiples(method); }
+        }
+    }
+
+    public double numTwinsSurjective() {
+        int size = this.findTwins().size();
+        if(size > this.rule.states.size()) {
+            return (double) (size - this.rule.states.size()) / size;
+        }
+        return 0;
+    }
+
+    public double numTwinsRedundant() {
         int size = this.findTwins().size();
         return (double) (size - 1) / size;
+    }
+
+    public double numTwinsMultiples(int count) {
+        int size = this.findTwins().size();
+        if(size == count) {
+            return (double) 1 / count;
+        }
+        return 0;
     }
 
     @Override

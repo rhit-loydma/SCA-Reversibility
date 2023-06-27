@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-MODE = "simplified"
+MODE = "expanded"
 
 fig = plt.figure(figsize=(6,6.5))
    
