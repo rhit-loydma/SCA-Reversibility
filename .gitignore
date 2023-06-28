@@ -1,3 +1,6 @@
+data/
+plots/
+
 ### IntelliJ IDEA ###
 out/
 !**/src/main/**/out/
