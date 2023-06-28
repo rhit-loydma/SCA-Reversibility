@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 from math import comb
 
-ROWS = 1
+ROWS = 2
 COLS = 2
 BC = "wrap"
 
-fig = plt.figure(figsize=(10,6))
+fig = plt.figure(figsize=(6,7.5))
     
 axs = []    
 
@@ -26,10 +26,12 @@ for i in range(1, ROWS * COLS + 1):
                 crossing =  str(bin(k))[2:]
                 c = crossing.count("1")
                 b = comb(9, c)
-                collections[t][c] += float(pts[k]) / (a*b)
+                collections[t][c] += float(pts[k]) / (0.01*pow(8,i)*a*b)
+
+    print(collections)
 
     axs.append(fig.add_subplot(ROWS, COLS, i))
-    axs[i-1].imshow(collections, origin='lower', cmap=plt.colormaps['BuPu'])
+    axs[i-1].imshow(collections, origin='lower', cmap=plt.colormaps['BuPu'], vmin=0, vmax=100)
     axs[i-1].set_title('Width = ' + str(i), fontsize=10)
 
 fig.tight_layout()
