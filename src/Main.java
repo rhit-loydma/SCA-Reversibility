@@ -1,5 +1,9 @@
+import java.awt.*;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -17,6 +21,7 @@ public class Main {
         switch (mode) {
             case ("pattern") -> patternMode();
             case ("surjective") -> surjectiveMode();
+            case ("injective") -> injectiveMode();
             case ("twins") -> twinsMode();
             default -> //GoE
                     GoEMode();
@@ -100,7 +105,48 @@ public class Main {
         }
 
         if(config.getLogging()) {
-            logData("data/Surjective/"+config.getMode()+".csv",arr);
+            logData("data/Properties/",config.getMode()+"_surjective.csv",arr);
+        }
+    }
+
+    public static void injectiveMode() {
+        int max = 16;
+        String mode = config.getMode();
+        if(mode.equals("expanded")) {
+            max = 512;
+        }
+        int[][] arr = new int[max][max];
+
+        int crossing = config.getCrossingRule();
+        int turning = config.getTurningRule();
+        if(turning == -1) {
+            for(int i = 0; i < max; i++) {
+                outputMessage("Turning Rule: " + i, 2);
+                if(crossing == -1) {
+                    for(int j = 0; j < max; j++) {
+                        outputMessage("Crossing Rule: " + j, 3);
+                        arr[i][j] = checkInjective(new Rule(mode, i*max+j));
+                    }
+                } else {
+                    outputMessage("Crossing Rule: " + crossing, 3);
+                    checkInjective(new Rule(mode, i*max+crossing));
+                }
+            }
+        } else {
+            outputMessage("Turning Rule: " + turning, 2);
+            if(crossing == -1) {
+                for(int j = 0; j < max; j++) {
+                    outputMessage("Crossing Rule: " + j, 3);
+                    checkInjective(new Rule(mode, turning*max+j));
+                }
+            } else {
+                outputMessage("Crossing Rule: " + crossing, 3);
+                checkInjective(new Rule(mode, turning*max+crossing));
+            }
+        }
+
+        if(config.getLogging()) {
+            logData("data/Properties/",config.getMode()+"_injective.csv",arr);
         }
     }
 
@@ -157,9 +203,9 @@ public class Main {
             }
             if(config.getLogging()) {
                 if(bc.equals("reflect")) {
-                    logData("data/Twins/"+ config.getMode()+"/" + w + "_" + bc + "_" + parity + "_" + m + ".csv",arr);
+                    logData("data/Twins/"+ config.getMode()+"/",w + "_" + bc + "_" + parity + "_" + m + ".csv",arr);
                 } else {
-                    logData("data/Twins/"+ config.getMode()+"/" + w + "_" + bc + "_" + m + ".csv",arr);
+                    logData("data/Twins/"+ config.getMode()+"/",w + "_" + bc + "_" + m + ".csv",arr);
                 }
             }
         }
@@ -207,9 +253,9 @@ public class Main {
             }
             if(config.getLogging()) {
                 if(bc.equals("reflect")) {
-                    logData("data/GardenOfEden/"+ config.getMode()+"/" + w + "_" + bc + "_" + parity + ".csv",arr);
+                    logData("data/GardenOfEden/"+ config.getMode()+"/",w + "_" + bc + "_" + parity + ".csv",arr);
                 } else {
-                    logData("data/GardenOfEden/"+ config.getMode()+"/" + w + "_" + bc + ".csv",arr);
+                    logData("data/GardenOfEden/"+ config.getMode()+"/",w + "_" + bc + ".csv",arr);
                 }
             }
         }
@@ -244,6 +290,18 @@ public class Main {
             return 1;
         } else {
             outputMessage("Rule " + rule.number + " is not surjective", 1);
+            return 0;
+        }
+    }
+
+    public static int checkInjective(Rule rule) {
+        outputMessage("\n"+rule.toDebugString(), 4);
+        SequentTable table = new SequentTable(rule);
+        if(table.isInjective()) {
+            System.out.println("Rule " + rule.number + " is injective");
+            return 1;
+        } else {
+            outputMessage("Rule " + rule.number + " is not injective", 1);
             return 0;
         }
     }
@@ -305,9 +363,14 @@ public class Main {
         }
     }
 
-    public static void logData(String filename, int[][] data) {
+    public static void logData(String path,String filename, int[][] data) {
         try {
-            FileWriter file = new FileWriter(filename);
+            File directory = new File(path);
+            if (! directory.exists()){
+                directory.mkdir();
+            }
+
+            FileWriter file = new FileWriter(path+filename);
             StringBuilder sb = new StringBuilder();
             for(int i = 0; i < data.length; i++) {
                 for(int j = 0; j < data[0].length; j++) {

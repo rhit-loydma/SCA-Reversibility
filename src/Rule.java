@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 public class Rule {
     int number;
@@ -34,6 +35,10 @@ public class Rule {
 
     public char getNext(String neighborhood) {
         return this.map.get(neighborhood);
+    }
+
+    public Set<String> neighborhoods() {
+        return this.map.keySet();
     }
 
     public void generateRuleMapWolfram() {
