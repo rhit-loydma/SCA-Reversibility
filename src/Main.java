@@ -18,6 +18,10 @@ public class Main {
     public static void main(String[] args) {
         config = new Config("config.properties");
         String mode = config.getType();
+
+        if(config.getLogging()) {
+            makeDirectories();
+        }
         switch (mode) {
             case ("pattern") -> patternMode();
             case ("surjective") -> surjectiveMode();
@@ -252,7 +256,7 @@ public class Main {
                 }
             }
             if(config.getLogging()) {
-                if(bc.equals("reflect")) {
+                if(bc.equals("reflect") || bc.equals("previous")) {
                     logData("data/GardenOfEden/"+ config.getMode()+"/",w + "_" + bc + "_" + parity + ".csv",arr);
                 } else {
                     logData("data/GardenOfEden/"+ config.getMode()+"/",w + "_" + bc + ".csv",arr);
@@ -391,6 +395,23 @@ public class Main {
     public static void outputMessage(String msg, int level) {
         if(config.getOutputLevel() >= level) {
             System.out.println(msg);
+        }
+    }
+
+    public static void makeDirectories() {
+        ArrayList<String> directories = new ArrayList<>();
+        directories.add("data/");
+        directories.add("data/Properties/");
+        directories.add("data/GardenOfEden/");
+        directories.add("data/Twins/");
+        directories.add("data/GardenOfEden/simplified");
+        directories.add("data/Twins/simplified");
+
+        for(String d: directories) {
+            File directory = new File(d);
+            if (! directory.exists()){
+                directory.mkdir();
+            }
         }
     }
 }

@@ -1,16 +1,15 @@
 import matplotlib.pyplot as plt
 
 ROWS = 2
-COLS = 5
-MODE = "simplified"
-BC = "none"
+COLS = 4
+BC = "previous_true"
 
-fig = plt.figure(figsize=(10,6))
+fig = plt.figure(figsize=(10,5))
     
 axs = []    
 
 for i in range(1, ROWS * COLS + 1):
-    data = open('data/GardenOfEden/' + MODE + '/' + str(i) + '_' + BC + '.csv','r').read()
+    data = open('data/GardenOfEden/simplified/' + str(i) + '_' + BC + '.csv','r').read()
     lines = data.split('\n')
 
     collections = []
@@ -25,6 +24,6 @@ for i in range(1, ROWS * COLS + 1):
     axs[i-1].set_title('Width = ' + str(i), fontsize=10)
 
 fig.tight_layout()
-plt.suptitle("Garden of Edens\nMode: " + MODE + "   Boundary Condition: " + BC + "\n",fontsize=16,y=1)
+# plt.suptitle("Garden of Edens\nMode: simplified   Boundary Condition: " + BC + "\n",fontsize=16,y=1)
 # plt.suptitle("Garden of Edens\nMode: " + MODE + "   Boundary Condition: reflect   Parity: true\n",fontsize=16,y=1)
 plt.show()  

@@ -1,6 +1,6 @@
 data/
 plots/
-
+.idea/
 ### IntelliJ IDEA ###
 out/
 !**/src/main/**/out/

@@ -28,8 +28,6 @@ for i in range(1, ROWS * COLS + 1):
                 b = comb(9, c)
                 collections[t][c] += float(pts[k]) / (0.01*pow(8,i)*a*b)
 
-    print(collections)
-
     axs.append(fig.add_subplot(ROWS, COLS, i))
     axs[i-1].imshow(collections, origin='lower', cmap=plt.colormaps['BuPu'], vmin=0, vmax=100)
     axs[i-1].set_title('Width = ' + str(i), fontsize=10)

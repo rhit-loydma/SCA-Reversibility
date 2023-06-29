@@ -10,12 +10,24 @@ public class Row {
     Rule rule;
     boolean parity;
     String bc;
+    char prevLeft;
+    char prevRight;
 
     public Row(char[] cells, Rule rule, boolean parity, String boundaryCondition) {
         this.cells = cells;
         this.rule = rule;
         this.parity = parity;
         this.bc = boundaryCondition;
+    }
+
+    //used for the previous row boundary condition
+    public Row(char[] cells, Rule rule, boolean parity, char prevLeft, char prevRight) {
+        this.cells = cells;
+        this.rule = rule;
+        this.parity = parity;
+        this.bc = "previous";
+        this.prevLeft = prevLeft;
+        this.prevRight = prevRight;
     }
 
     /**
@@ -61,6 +73,7 @@ public class Row {
         return switch (this.bc) {
             case "wrap" -> this.getSuccessorWrap();
             case "reflect" -> this.getSuccessorReflect();
+            case "previous" -> this.getSuccessorPrevious();
             default -> this.getSuccessorNone();
         };
     }
@@ -113,6 +126,29 @@ public class Row {
         }
 
         return new Row(newCells, rule, !parity, this.bc);
+    }
+
+    public Row getSuccessorPrevious() {
+        char[] newCells;
+        String neighborhood;
+        int offset;
+
+        if(this.parity) { //row with less cells, need to use previous cells
+            newCells = new char[this.cells.length + 1];
+            newCells[0] = this.rule.getNext("" + this.prevLeft + this.cells[0]);
+            newCells[this.cells.length] = this.rule.getNext("" + this.cells[this.cells.length-1] + this.prevRight);
+            offset = 1;
+        } else { //"normal" case
+            newCells = new char[this.cells.length - 1];
+            offset = 0;
+        }
+
+        for(int i = 0; i < this.cells.length - 1; i++) {
+            neighborhood = "" + this.cells[i] + this.cells[i+1];
+            newCells[i+offset] = this.rule.getNext(neighborhood);
+        }
+
+        return new Row(newCells, rule, !parity, this.cells[0], this.cells[this.cells.length-1]);
     }
 
     public static char getReflectedCell(char cell) {
