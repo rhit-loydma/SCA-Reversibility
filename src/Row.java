@@ -194,28 +194,99 @@ public class Row {
             }
             a = b;
         }
+
+        return switch (this.bc) {
+            case "wrap" -> this.findPredecessorsWrap(a);
+            case "reflect" -> this.findPredecessorsReflect(a);
+            case "previous" -> this.findPredecessorsPrevious(a);
+            default -> this.findPredecessorsNone(a);
+        };
+    }
+
+    public HashSet<Row> findPredecessorsWrap(ArrayList<String> a) {
         HashSet<Row> set = new HashSet<>();
         for (String cur : a) {
-            if(this.bc.equals("wrap")) {
-                char first = cur.charAt(0);
-                char last = cur.charAt(cur.length()-1);
-                if(first == last) {
-                    String s = cur.substring(0, cur.length() - 1);
-                    set.add(new Row(s.toCharArray(), this.rule, !this.parity, this.bc));
-                }
-            } else if (this.bc.equals("reflect") && !this.parity) {
+            char first = cur.charAt(0);
+            char last = cur.charAt(cur.length()-1);
+            if(first == last) {
+                String s = cur.substring(0, cur.length() - 1);
+                set.add(new Row(s.toCharArray(), this.rule, !this.parity, this.bc));
+            }
+        }
+        return set;
+    }
+
+    public HashSet<Row> findPredecessorsReflect(ArrayList<String> a) {
+        HashSet<Row> set = new HashSet<>();
+        for (String cur : a) {
+            if (!this.parity) {
                 char first = cur.charAt(0);
                 char second = cur.charAt(1);
 
                 char last = cur.charAt(cur.length() - 1);
                 char secondLast = cur.charAt(cur.length() - 2);
 
-                if(first == getReflectedCell(second) && last == getReflectedCell(secondLast)) {
-                    set.add(new Row(cur.substring(1,cur.length()-1).toCharArray(), this.rule, !this.parity, this.bc));
+                if (first == getReflectedCell(second) && last == getReflectedCell(secondLast)) {
+                    set.add(new Row(cur.substring(1, cur.length() - 1).toCharArray(), this.rule, true, this.bc));
                 }
             } else {
-                set.add(new Row(cur.toCharArray(), this.rule, !this.parity, this.bc));
+                set.add(new Row(cur.toCharArray(), this.rule, false, this.bc));
             }
+        }
+        return set;
+    }
+
+    public HashSet<Row> findPredecessorsPrevious(ArrayList<String> a) {
+        HashSet<Row> set = new HashSet<>();
+        for (String cur : a) {
+            if (!this.parity) {
+//                char first = cur.charAt(0);
+//                char second = cur.charAt(1);
+//
+//                char last = cur.charAt(cur.length() - 1);
+//                char secondLast = cur.charAt(cur.length() - 2);
+//
+//                boolean l = false;
+//                for(char c: rule.states) {
+//                    if(rule.getNext(String.valueOf(first + c)) == second) {
+//                        l = true;
+//                    }
+//                }
+//
+//                boolean r = false;
+//                for(char c: rule.states) {
+//                    if(rule.getNext(String.valueOf(c + last)) == secondLast) {
+//                        r = true;
+//                    }
+//                }
+//
+//                if(l && r) {
+//                    set.add(new Row(cur.substring(1, cur.length() - 1).toCharArray(), this.rule, true, this.bc));
+//                }
+                char second = cur.charAt(0);
+                char secondLast = cur.charAt(cur.length()-1);
+
+                Row curRow = new Row(cur.substring(1, cur.length() - 1).toCharArray(), this.rule, true, this.bc);
+                for(Row row: curRow.findPredecessors()) {
+                    char[] chars = row.cells;
+                    char first = chars[0];
+                    char last = chars[cur.length()-1];
+                    if(rule.getNext(first + second+"") == this.cells[0]
+                        && rule.getNext(secondLast + last + "") == this.cells[this.cells.length-1]) {
+                        set.add(curRow);
+                    }
+                }
+            } else {
+                set.add(new Row(cur.toCharArray(), this.rule, false, this.bc));
+            }
+        }
+        return set;
+    }
+
+    public HashSet<Row> findPredecessorsNone(ArrayList<String> a) {
+        HashSet<Row> set = new HashSet<>();
+        for (String cur : a) {
+            set.add(new Row(cur.toCharArray(), this.rule, !this.parity, this.bc));
         }
         return set;
     }
