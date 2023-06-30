@@ -25,11 +25,11 @@ public class Rule {
         this.max = 16;
         switch (mode) {
             case ("wolfram") -> generateRuleMapWolfram();
-            case ("expanded") -> {
+            case ("original") -> {
                 max = 512;
-                generateRuleMapExpanded();
+                generateRuleMapOriginal();
             }
-            default -> generateRuleMapCrossing();
+            default -> generateRuleMapSimplified();
         }
     }
 
@@ -53,7 +53,7 @@ public class Rule {
         states.add('1');
     }
 
-    public void generateRuleMapCrossing() {
+    public void generateRuleMapSimplified() {
         String bin = Integer.toString(this.number, 2);
         bin = "0".repeat(8 - bin.length()) + bin;
         for(int i = 0; i < 16; i++) {
@@ -64,7 +64,7 @@ public class Rule {
             int tIndex = (left/2)*2 + (right/2);
             int cIndex = (left%2)*2 + (right%2) + 4;
             int output = (bin.charAt(tIndex)-'0')*2 + (bin.charAt(cIndex)-'0');
-            this.map.put("" + getStateCrossing(left) + getStateCrossing(right), getStateCrossing(output));
+            this.map.put("" + getStateSimplified(left) + getStateSimplified(right), getStateSimplified(output));
         }
         states.add('B');
         states.add('F');
@@ -72,7 +72,7 @@ public class Rule {
         states.add('L');
     }
 
-    public static char getStateCrossing(int c) {
+    public static char getStateSimplified(int c) {
         return switch (c) {
             case (0) -> 'B';
             case (1) -> 'F';
@@ -81,8 +81,8 @@ public class Rule {
         };
     }
 
-    public void generateRuleMapExpanded() {
-        generateExpandedStates();
+    public void generateRuleMapOriginal() {
+        generateOriginalStates();
 
         String crossing = Integer.toString(this.number%max, 2);
         crossing = "0".repeat(9 - crossing.length()) + crossing;
@@ -121,12 +121,12 @@ public class Rule {
                     c = -1;
                 }
 
-                map.put("" + left + right, getOutputExpanded(l,r,c));
+                map.put("" + left + right, getOutputOriginal(l,r,c));
             }
         }
     }
 
-    public void generateExpandedStates() {
+    public void generateOriginalStates() {
         states.add(SNN);
         states.add(NNN);
         states.add(NSN);
@@ -160,7 +160,7 @@ public class Rule {
         };
     }
 
-    public static char getOutputExpanded(int leftTurning, int rightTurning, int crossing) {
+    public static char getOutputOriginal(int leftTurning, int rightTurning, int crossing) {
         switch (crossing) {
             case 1 -> {return SSL;}
             case 0 -> {return SSR;}

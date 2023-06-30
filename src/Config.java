@@ -26,7 +26,7 @@ public class Config {
 
     public String getMode(){
         String input = this.prop.getProperty("mode");
-        String[] vals = new String[]{"expanded", "simplified", "wolfram"};
+        String[] vals = new String[]{"expanded", "simplified", "wolfram", "original"};
         return this.validateParam("mode",input, vals);
     }
 
@@ -48,8 +48,8 @@ public class Config {
     public boolean getLogging() {
         String input = this.prop.getProperty("logging");
         if(input.equals("true")) {
-            if(!(this.getCrossingRule()==-1) || !(this.getTurningRule()==-1)) {
-                System.out.println("logging can only occur on all rules");
+            if(!(this.getCrossingRule()==-1) || !(this.getTurningRule()==-1) || this.getType().equals("pattern")) {
+                System.out.println("logging can only occur on all rules and not in pattern mode");
                 System.exit(1);
             }
             return true;

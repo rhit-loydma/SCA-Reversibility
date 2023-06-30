@@ -1,174 +1,32 @@
-import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class Main {
     static Config config;
 
-    /**
-     * Initializes the config parser and starts an experiment mode
-     * @param args
-     */
     public static void main(String[] args) {
         config = new Config("config.properties");
-        String mode = config.getType();
 
-        if(config.getLogging()) {
-            makeDirectories();
-        }
-        switch (mode) {
-            case ("pattern") -> patternMode();
-            case ("surjective") -> surjectiveMode();
-            case ("injective") -> injectiveMode();
-            case ("twins") -> twinsMode();
-            default -> //GoE
-                    GoEMode();
-        }
-    }
-
-    /**
-     * Prints a pattern using initial conditions defined in a config file
-     */
-    public static void patternMode(){
-        char[] start = config.getPatternString();
-        int height = config.getPatternHeight();
-        int crossing = config.getCrossingRule();
-        int turning = config.getTurningRule();
-        String bc = config.getBoundaryCondition();
-        int max = 16;
-        String mode = config.getMode();
-        if(mode.equals("expanded")) {
-            max = 512;
-        }
-        if(turning == -1) {
-            for(int i = 0; i < max; i++) {
-                outputMessage("Turning Rule: " + i, 2);
-                if(crossing == -1) {
-                    for(int j = 0; j < max; j++) {
-                        outputMessage("Crossing Rule: " + j, 3);
-                        generatePattern(new Rule(mode, i*max + j), start, height, bc);
-                    }
-                } else {
-                    generatePattern(new Rule(mode, i*max + crossing), start, height, bc);
-                }
-            }
-        } else {
-            outputMessage("Turning Rule: " + turning, 2);
-            if(crossing == -1) {
-                for(int j = 0; j < max; j++) {
-                    outputMessage("Crossing Rule: " + j, 3);
-                    generatePattern(new Rule(mode, turning*max + j), start, height, bc);
-                }
-            } else {
-                outputMessage("Crossing Rule: " + crossing, 3);
-                generatePattern(new Rule(mode, turning*max + crossing), start, height, bc);
-            }
-        }
-    }
-
-    public static void surjectiveMode() {
-        int max = 16;
-        String mode = config.getMode();
-        if(mode.equals("expanded")) {
-            max = 512;
-        }
-        int[][] arr = new int[max][max];
-
-        int crossing = config.getCrossingRule();
-        int turning = config.getTurningRule();
-        if(turning == -1) {
-            for(int i = 0; i < max; i++) {
-                outputMessage("Turning Rule: " + i, 2);
-                if(crossing == -1) {
-                    for(int j = 0; j < max; j++) {
-                        outputMessage("Crossing Rule: " + j, 3);
-                        arr[i][j] = checkSurjective(new Rule(mode, i*max+j));
-                    }
-                } else {
-                    outputMessage("Crossing Rule: " + crossing, 3);
-                    checkSurjective(new Rule(mode, i*max+crossing));
-                }
-            }
-        } else {
-            outputMessage("Turning Rule: " + turning, 2);
-            if(crossing == -1) {
-                for(int j = 0; j < max; j++) {
-                    outputMessage("Crossing Rule: " + j, 3);
-                    checkSurjective(new Rule(mode, turning*max+j));
-                }
-            } else {
-                outputMessage("Crossing Rule: " + crossing, 3);
-                checkSurjective(new Rule(mode, turning*max+crossing));
-            }
-        }
-
-        if(config.getLogging()) {
-            logData("data/Properties/",config.getMode()+"_surjective.csv",arr);
-        }
-    }
-
-    public static void injectiveMode() {
-        int max = 16;
-        String mode = config.getMode();
-        if(mode.equals("expanded")) {
-            max = 512;
-        }
-        int[][] arr = new int[max][max];
-
-        int crossing = config.getCrossingRule();
-        int turning = config.getTurningRule();
-        if(turning == -1) {
-            for(int i = 0; i < max; i++) {
-                outputMessage("Turning Rule: " + i, 2);
-                if(crossing == -1) {
-                    for(int j = 0; j < max; j++) {
-                        outputMessage("Crossing Rule: " + j, 3);
-                        arr[i][j] = checkInjective(new Rule(mode, i*max+j));
-                    }
-                } else {
-                    outputMessage("Crossing Rule: " + crossing, 3);
-                    checkInjective(new Rule(mode, i*max+crossing));
-                }
-            }
-        } else {
-            outputMessage("Turning Rule: " + turning, 2);
-            if(crossing == -1) {
-                for(int j = 0; j < max; j++) {
-                    outputMessage("Crossing Rule: " + j, 3);
-                    checkInjective(new Rule(mode, turning*max+j));
-                }
-            } else {
-                outputMessage("Crossing Rule: " + crossing, 3);
-                checkInjective(new Rule(mode, turning*max+crossing));
-            }
-        }
-
-        if(config.getLogging()) {
-            logData("data/Properties/",config.getMode()+"_injective.csv",arr);
-        }
-    }
-
-    public static void twinsMode() {
-        String mode = config.getMode();
         int start = config.getStartWidth();
         int end = config.getEndWidth();
-        String bc = config.getBoundaryCondition();
-        int crossing = config.getCrossingRule();
-        int turning = config.getTurningRule();
-        boolean parity = config.getParity();
-        int method = config.getCountingMethod();
+        if(config.getType().contains("jective")) {
+            end = start + 1;
+        }
 
         int max = 16;
+        String mode = config.getMode();
         if(mode.equals("expanded")) {
+            max = 256;
+        } else if(mode.equals("original")) {
             max = 512;
         }
         int[][] arr = new int[max][max];
+
+        int crossing = config.getCrossingRule();
+        int turning = config.getTurningRule();
+
         for(int w = start; w <= end; w++) {
             outputMessage(w + " " + java.time.LocalTime.now(), 1);
             if (turning == -1) {
@@ -177,11 +35,11 @@ public class Main {
                     if (crossing == -1) {
                         for (int j = 0; j < max; j++) {
                             outputMessage("Crossing Rule: " + j, 3);
-                            arr[i][j] = findTwins(new Rule(mode, i * max + j), w, bc, parity, method);
+                            arr[i][j] = performComputation(new Rule(mode, i * max + j), w);
                         }
                     } else {
                         outputMessage("Crossing Rule: " + crossing, 3);
-                        findTwins(new Rule(mode, i * max + crossing), w, bc, parity, method);
+                        performComputation(new Rule(mode, i * max + crossing), w);
                     }
                 }
             } else {
@@ -189,83 +47,46 @@ public class Main {
                 if (crossing == -1) {
                     for (int j = 0; j < max; j++) {
                         outputMessage("Crossing Rule: " + j, 3);
-                        findTwins(new Rule(mode, turning * max + j), w, bc, parity, method);
+                        performComputation(new Rule(mode, turning * max + j), w);
                     }
                 } else {
                     outputMessage("Crossing Rule: " + crossing, 3);
-                    findTwins(new Rule(mode, turning * max + crossing), w, bc, parity, method);
+                    performComputation(new Rule(mode, turning * max + crossing), w);
                 }
-            }
-            String m;
-            switch(method) {
-                case -2 -> {m = "surjective";}
-                case -1 -> {m = "redundant";}
-                case 2 -> {m = "twins";}
-                case 3 -> {m = "triplets";}
-                case 4-> {m = "quadruplets";}
-                default -> {m = String.valueOf(method);}
             }
             if(config.getLogging()) {
-                if(bc.equals("reflect")) {
-                    logData("data/Twins/"+ config.getMode()+"/",w + "_" + bc + "_" + parity + "_" + m + ".csv",arr);
-                } else {
-                    logData("data/Twins/"+ config.getMode()+"/",w + "_" + bc + "_" + m + ".csv",arr);
-                }
+                handleLogging(arr, w);
             }
         }
+
     }
 
-    public static void GoEMode() {
-        String mode = config.getMode();
-        int start = config.getStartWidth();
-        int end = config.getEndWidth();
+    public static int performComputation(Rule rule, int width) {
         String bc = config.getBoundaryCondition();
-        int crossing = config.getCrossingRule();
-        int turning = config.getTurningRule();
         boolean parity = config.getParity();
-        int max = 16;
-        if(mode.equals("expanded")) {
-            max = 512;
-        }
-        int[][] arr = new int[max][max];
-        for(int w = start; w <= end; w++) {
-            outputMessage(w + " " + java.time.LocalTime.now(), 1);
-            if(turning == -1) {
-                for(int i = 0; i < max; i++) {
-                    outputMessage("Turning Rule: " + i, 2);
-                    if(crossing == -1) {
-                        for(int j = 0; j < max; j++) {
-                            outputMessage("Crossing Rule: " + j, 3);
-                            arr[i][j] = findGoEs(new Rule(mode, i*max+j),w,bc, parity);
-                        }
-                    } else {
-                        outputMessage("Crossing Rule: " + crossing, 3);
-                        findGoEs(new Rule(mode, i*max+crossing),w,bc, parity);
-                    }
-                }
-            } else {
-                outputMessage("Turning Rule: " + turning, 2);
-                if(crossing == -1) {
-                    for(int j = 0; j < max; j++) {
-                        outputMessage("Crossing Rule: " + j, 3);
-                        findGoEs(new Rule(mode, turning*max+j),w,bc, parity);
-                    }
-                } else {
-                    outputMessage("Crossing Rule: " + crossing, 3);
-                    findGoEs(new Rule(mode, turning*max+crossing),w,bc, parity);
-                }
+        switch (config.getType()) {
+            case ("pattern") -> {
+                char[] start = config.getPatternString();
+                int height = config.getPatternHeight();
+                return generatePattern(rule, start, height, bc);
             }
-            if(config.getLogging()) {
-                if(bc.equals("reflect") || bc.equals("previous")) {
-                    logData("data/GardenOfEden/"+ config.getMode()+"/",w + "_" + bc + "_" + parity + ".csv",arr);
-                } else {
-                    logData("data/GardenOfEden/"+ config.getMode()+"/",w + "_" + bc + ".csv",arr);
-                }
+            case ("surjective") -> {
+                return checkSurjective(rule);
+            }
+            case ("injective") -> {
+                return checkInjective(rule);
+            }
+            case ("twins") -> {
+                int method = config.getCountingMethod();
+                return findTwins(rule, width, bc, parity, method);
+            }
+            default -> {
+                return findGoEs(rule, width, bc, parity);
             }
         }
     }
 
-    public static void generatePattern(Rule rule, char[] start, int height, String boundaryCondition) {
+    public static int generatePattern(Rule rule, char[] start, int height, String boundaryCondition) {
         Stack<String> rows = new Stack<>();
         Queue<String> rowsBracelet = new LinkedList<>();
         Row r = new Row(start, rule, false, boundaryCondition);
@@ -284,6 +105,7 @@ public class Main {
         System.out.println(sb.toString());
         outputMessage(sb2.toString(), 1);
         outputMessage("\n"+rule.toDebugString(), 4);
+        return 0;
     }
 
     public static int checkSurjective(Rule rule) {
@@ -367,14 +189,46 @@ public class Main {
         }
     }
 
-    public static void logData(String path,String filename, int[][] data) {
+    public static void handleLogging(int[][] arr, int width) {
+        String filename = "data/" + config.getType() + "/";
+
+        String type = config.getType();
+        boolean logParity = false;
+        switch (type) {
+            case "injective", "surjective" -> filename = config.getMode() + "_" + type;
+            case "twins" -> {
+                filename += config.getMode() + "/" + width + "_" + config.getCountingMethod() + "_" + config.getBoundaryCondition();
+                logParity = true;
+            }
+            case "GoE" -> {
+                filename += config.getMode() + "/" + width + "_" + config.getBoundaryCondition();
+                logParity = true;
+            }
+            default -> { return; }
+        }
+
+        String bc = config.getBoundaryCondition();
+        if(logParity && (bc.equals("reflect") || bc.equals("previous"))) {
+            filename += "_" + config.getParity();
+        }
+
+        filename += ".csv";
+        logData(filename,arr);
+    }
+
+    public static void logData(String filename, int[][] data) {
         try {
-            File directory = new File(path);
-            if (! directory.exists()){
-                directory.mkdir();
+            String[] parts = filename.split("/");
+            String soFar = "";
+            for(int i = 0; i < parts.length - 1; i++) {
+                soFar += parts[i] + "/";
+                File directory = new File(soFar);
+                if (! directory.exists()){
+                    directory.mkdir();
+                }
             }
 
-            FileWriter file = new FileWriter(path+filename);
+            FileWriter file = new FileWriter(filename);
             StringBuilder sb = new StringBuilder();
             for(int i = 0; i < data.length; i++) {
                 for(int j = 0; j < data[0].length; j++) {
@@ -395,23 +249,6 @@ public class Main {
     public static void outputMessage(String msg, int level) {
         if(config.getOutputLevel() >= level) {
             System.out.println(msg);
-        }
-    }
-
-    public static void makeDirectories() {
-        ArrayList<String> directories = new ArrayList<>();
-        directories.add("data/");
-        directories.add("data/Properties/");
-        directories.add("data/GardenOfEden/");
-        directories.add("data/Twins/");
-        directories.add("data/GardenOfEden/simplified");
-        directories.add("data/Twins/simplified");
-
-        for(String d: directories) {
-            File directory = new File(d);
-            if (! directory.exists()){
-                directory.mkdir();
-            }
         }
     }
 }
