@@ -4,11 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Rule {
-    int number;
-    HashMap<String, Character> map;
-    ArrayList<Character> states;
-    int max;
-
     public static final char SNN = '/';
     public static final char NNN = '_';
     public static final char NSN = '\\';
@@ -18,19 +13,27 @@ public class Rule {
     public static final char SSR = 'R';
     public static final char SSL = 'L';
 
+    int number;
+    HashMap<String, Character> map;
+    ArrayList<Character> states;
+    int maxT;
+    int maxC;
+
     public Rule(String mode, int number) {
         this.number = number;
         this.map = new HashMap<>();
         this.states = new ArrayList<>();
-        this.max = 16;
+        this.maxT = 16;
         switch (mode) {
             case ("wolfram") -> generateRuleMapWolfram();
             case ("original") -> {
-                max = 512;
+                maxT = 512;
+                maxC = 512;
                 generateRuleMapOriginal();
             }
             case ("expanded") -> {
-                max = 512;
+                maxT = 256;
+                maxC = 16;
                 generateRuleMapExpanded();
             }
             default -> generateRuleMapSimplified();
@@ -88,10 +91,10 @@ public class Rule {
     public void generateRuleMapOriginal() {
         generateOriginalStates();
 
-        String crossing = Integer.toString(this.number%max, 2);
+        String crossing = Integer.toString(this.number%maxC, 2);
         crossing = "0".repeat(9 - crossing.length()) + crossing;
 
-        String turning = Integer.toString(this.number/max, 2);
+        String turning = Integer.toString(this.number/maxC, 2);
         turning = "0".repeat(9 - turning.length()) + turning;
 
         for(char left: states) {
@@ -188,7 +191,7 @@ public class Rule {
     }
 
     public String toString() {
-        return "turning rule: " + this.number/max + ", crossing rule: " + this.number % max;
+        return "turning rule: " + this.number/maxC + ", crossing rule: " + this.number % maxC;
     }
 
     public String toDebugString(){
@@ -224,22 +227,31 @@ public class Rule {
     public void generateRuleMapExpanded() {
         generateExpandedStates();
 
-        String crossing = Integer.toString(this.number%max, 2);
-        crossing = "0".repeat(9- crossing.length()) + crossing;
+        String crossing = Integer.toString(this.number%maxC, 2);
+        //get 4-bit rule
+        crossing = "0".repeat(4 - crossing.length()) + crossing;
+        //fill in pre-determined bits
+        crossing = crossing.substring(0,2) + "1" + crossing.substring(2,4) + "1002";
 
-        String turning = Integer.toString(this.number/max, 2);
-        turning = "0".repeat(9- turning.length()) + turning;
+        String turning = Integer.toString(this.number/maxC, 2);
+        //get 8-bit rule
+        turning = "0".repeat(8 - turning.length()) + turning;
+        //fill in pre-determined bits
+        turning = turning + "2";
+
+//        System.out.println("Crossing: " + this.number%maxC + " " + crossing);
+//        System.out.println("Turning: " + this.number/maxC + " " + turning);
 
         for(char left: states) {
             for(char right: states) {
                 //need to get crossing and turning status of each cell
-                int leftC = getCrossingStatusExpanded(left);
+                int leftC = getTopThreadExpanded(left);
                 int leftT = getTurningStatusExpanded(left);
-                int rightC = getCrossingStatusExpanded(right);
+                int rightC = getTopThreadExpanded(right);
                 int rightT = getTurningStatusExpanded(right);
                 //use those to calculate indexes
-                int crossingIndex = (3 * leftC + rightC);
-                int turningIndex = (3 * leftT + rightT);
+                int crossingIndex = 3 * leftC + rightC;
+                int turningIndex = 3 * leftT + rightT;
                 //take binary strings reps of rules, get char at index
                 int c = crossing.charAt(crossingIndex)-'0';
                 int t = turning.charAt(turningIndex)-'0';
@@ -257,10 +269,20 @@ public class Rule {
                 }
 
                 //check if to make sure there are threads
-                if (l == 2 && r == 2) {
-                    c = 2;
-                }
-
+                int cs = l*10 + r;
+                c = switch(cs) {
+                    case 0, 11 ->  c; //exists, exists
+                    case 2, 12 -> 1; //upright, none -> left is on top
+                    case 20, 21 -> 0; //none, exists -> right is on top
+                    case 22 -> 2; //none, none -> no thread is on top
+                    default -> 2;
+                };
+//                System.out.println("Neighborhood: " + left + " " + right);
+//                System.out.println("Statuses: " + leftT + " " + leftC + " " + rightT + " " + rightC);
+//                System.out.println("Indexes: " + turningIndex + " " + crossingIndex);
+//                System.out.println("Before checks: " + t + " " + c);
+//                System.out.println("After checks: " + l + " " + r + " " + c);
+//                System.out.println();
                 map.put("" + left + right, getOutputExpanded(l,r,c));
             }
         }
@@ -277,10 +299,10 @@ public class Rule {
         states.add('l');
         states.add('N');
     }
-    public static int getCrossingStatusExpanded(char cell) {
+    public static int getTopThreadExpanded(char cell) {
         return switch (cell) {
-            case 'B', 'R' -> 0;
-            case 'F', 'L' -> 1;
+            case 'B', 'R', 'b', 'r' -> 0;
+            case 'F', 'L', 'f', 'l' -> 1;
             default -> 2;
         };
     }
@@ -303,10 +325,10 @@ public class Rule {
             case 100 -> 'F';
             case 11 -> 'R';
             case 111 -> 'L';
-            case 220 -> 'b';
-            case 202 -> 'f';
-            case 221 -> 'l';
-            case 212 -> 'r';
+            case 20 -> 'b';
+            case 102 -> 'f';
+            case 112 -> 'l';
+            case 21 -> 'r';
             default -> 'N';
         };
     }

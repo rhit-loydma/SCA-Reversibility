@@ -15,12 +15,16 @@ public class Main {
             end = config.getEndWidth();
         }
 
-        int max = 16;
+        int maxT = 16;
+        int maxC = 16;
         String mode = config.getMode();
-        if(mode.equals("expanded") || mode.equals("original")) {
-            max = 512;
+        if(mode.equals("expanded")) {
+            maxT = 256;
+        } else if (mode.equals("original")) {
+            maxT = 512;
+            maxC = 512;
         }
-        int[][] arr = new int[max][max];
+        int[][] arr = new int[maxT][maxC];
 
         int crossing = config.getCrossingRule();
         int turning = config.getTurningRule();
@@ -28,28 +32,28 @@ public class Main {
         for(int w = start; w <= end; w++) {
             outputMessage(w + " " + java.time.LocalTime.now(), 1);
             if (turning == -1) {
-                for (int i = 0; i < max; i++) {
+                for (int i = 0; i < maxT; i++) {
                     outputMessage("Turning Rule: " + i, 2);
                     if (crossing == -1) {
-                        for (int j = 0; j < max; j++) {
+                        for (int j = 0; j < maxC; j++) {
                             outputMessage("Crossing Rule: " + j, 3);
-                            arr[i][j] = performComputation(new Rule(mode, i * max + j), w);
+                            arr[i][j] = performComputation(new Rule(mode, i * maxC + j), w);
                         }
                     } else {
                         outputMessage("Crossing Rule: " + crossing, 3);
-                        performComputation(new Rule(mode, i * max + crossing), w);
+                        performComputation(new Rule(mode, i * maxC + crossing), w);
                     }
                 }
             } else {
                 outputMessage("Turning Rule: " + turning, 2);
                 if (crossing == -1) {
-                    for (int j = 0; j < max; j++) {
+                    for (int j = 0; j < maxC; j++) {
                         outputMessage("Crossing Rule: " + j, 3);
-                        performComputation(new Rule(mode, turning * max + j), w);
+                        performComputation(new Rule(mode, turning * maxC + j), w);
                     }
                 } else {
                     outputMessage("Crossing Rule: " + crossing, 3);
-                    performComputation(new Rule(mode, turning * max + crossing), w);
+                    performComputation(new Rule(mode, turning * maxC + crossing), w);
                 }
             }
             if(config.getLogging()) {
