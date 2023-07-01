@@ -67,6 +67,8 @@ public class Config {
             int input = Integer.parseInt(this.prop.getProperty("turningRule"));
             int max = 15;
             if(getMode().equals("expanded")) {
+                max = 255;
+            } else if(getMode().equals("original")) {
                 max = 511;
             }
             if (input < 0 || input > max) {
@@ -88,7 +90,7 @@ public class Config {
         try {
             int input = Integer.parseInt(this.prop.getProperty("crossingRule"));
             int max = 15;
-            if(getMode().equals("expanded")) {
+            if(getMode().equals("original")) {
                 max = 511;
             }
             if (input < 0 || input > max) {
