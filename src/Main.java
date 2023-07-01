@@ -10,16 +10,14 @@ public class Main {
         config = new Config("config.properties");
 
         int start = config.getStartWidth();
-        int end = config.getEndWidth();
-        if(config.getType().contains("jective")) {
-            end = start + 1;
+        int end = start;
+        if(config.getType().equals("twins") || config.getType().equals("GoE")) {
+            end = config.getEndWidth();
         }
 
         int max = 16;
         String mode = config.getMode();
-        if(mode.equals("expanded")) {
-            max = 256;
-        } else if(mode.equals("original")) {
+        if(mode.equals("expanded") || mode.equals("original")) {
             max = 512;
         }
         int[][] arr = new int[max][max];
@@ -87,20 +85,13 @@ public class Main {
     }
 
     public static int generatePattern(Rule rule, char[] start, int height, String boundaryCondition) {
-        Stack<String> rows = new Stack<>();
-        Queue<String> rowsBracelet = new LinkedList<>();
-        Row r = new Row(start, rule, false, boundaryCondition);
-        for(int i = 0; i < height; i++) {
-            rows.push(r.toString() + "     " + i + "\n");
-            rowsBracelet.add(r.toStringBracelet() + '\n');
-            r = r.getSuccessor();
-        }
-
         StringBuilder sb = new StringBuilder(rule.toString() + "\n");
         StringBuilder sb2 = new StringBuilder();
-        while(!rows.isEmpty()){
-            sb.append(rows.pop());
-            sb2.append(rowsBracelet.remove());
+        Row r = new Row(start, rule, false, boundaryCondition);
+        for(int i = 0; i < height; i++) {
+            sb.append(r.toString() + "     " + i + "\n");
+            sb2.append(r.toStringBracelet() + '\n');
+            r = r.getSuccessor();
         }
         System.out.println(sb.toString());
         outputMessage(sb2.toString(), 1);
@@ -112,10 +103,10 @@ public class Main {
         outputMessage("\n"+rule.toDebugString(), 4);
         Node n = new Node(rule);
         if(n.isSurjective()) {
-            System.out.println("Rule " + rule.number + " is surjective");
+            outputMessage("Rule " + rule.number + " is surjective", 2);
             return 1;
         } else {
-            outputMessage("Rule " + rule.number + " is not surjective", 1);
+            outputMessage("Rule " + rule.number + " is not surjective", 3);
             return 0;
         }
     }
@@ -124,10 +115,10 @@ public class Main {
         outputMessage("\n"+rule.toDebugString(), 4);
         SequentTable table = new SequentTable(rule);
         if(table.isInjective()) {
-            System.out.println("Rule " + rule.number + " is injective");
+            outputMessage("Rule " + rule.number + " is injective", 2);
             return 1;
         } else {
-            outputMessage("Rule " + rule.number + " is not injective", 1);
+            outputMessage("Rule " + rule.number + " is not injective", 3);
             return 0;
         }
     }
@@ -195,7 +186,7 @@ public class Main {
         String type = config.getType();
         boolean logParity = false;
         switch (type) {
-            case "injective", "surjective" -> filename = config.getMode() + "_" + type;
+            case "injective", "surjective" -> filename += config.getMode() + "_" + type;
             case "twins" -> {
                 filename += config.getMode() + "/" + width + "_" + config.getCountingMethod() + "_" + config.getBoundaryCondition();
                 logParity = true;

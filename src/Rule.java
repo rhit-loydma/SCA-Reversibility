@@ -29,6 +29,10 @@ public class Rule {
                 max = 512;
                 generateRuleMapOriginal();
             }
+            case ("expanded") -> {
+                max = 512;
+                generateRuleMapExpanded();
+            }
             default -> generateRuleMapSimplified();
         }
     }
@@ -106,13 +110,13 @@ public class Rule {
 
                 //check for absent left thread for turning status
                 int l = t;
-                if(left == NNN || left == NSN || left == UNN) {
+                if(left == NNN || left == SNN || left == UNN) {
                     l = -1;
                 }
 
                 //check for absent right thread for turning status
                 int r = t;
-                if(right == NNN || right == SNN || right == NUN) {
+                if(right == NNN || right == NSN || right == NUN) {
                     r = -1;
                 }
 
@@ -196,14 +200,115 @@ public class Rule {
         sb.append('\n');
         for(char c: states) {
             sb.append("\u001B[1;36m" + c);
-            sb.append("\u001B[0m" + " ");
+            sb.append("\u001B[0m "); //reset bold
             for(char d: states) {
+                char output = map.get(""+c+d);
+                sb.append(getDebugColor(output));
                 sb.append(map.get(""+c+d));
                 sb.append(" ");
             }
             sb.append('\n');
         }
+        sb.append("\u001B[0m"); //reset colors
         return sb.toString();
+    }
+
+    public static String getDebugColor(char c) {
+        return switch (c) {
+            case 'B', 'R', 'F', 'L', UUN -> "\u001B[32m"; //green, 2 strands
+            case 'b', 'r', 'f', 'l', SNN, NSN, UNN, NUN -> "\u001B[33m"; //yellow, 1 strand;
+            default -> "\u001B[31m"; //red, no strands
+        };
+    }
+
+    public void generateRuleMapExpanded() {
+        generateExpandedStates();
+
+        String crossing = Integer.toString(this.number%max, 2);
+        crossing = "0".repeat(9- crossing.length()) + crossing;
+
+        String turning = Integer.toString(this.number/max, 2);
+        turning = "0".repeat(9- turning.length()) + turning;
+
+        for(char left: states) {
+            for(char right: states) {
+                //need to get crossing and turning status of each cell
+                int leftC = getCrossingStatusExpanded(left);
+                int leftT = getTurningStatusExpanded(left);
+                int rightC = getCrossingStatusExpanded(right);
+                int rightT = getTurningStatusExpanded(right);
+                //use those to calculate indexes
+                int crossingIndex = (3 * leftC + rightC);
+                int turningIndex = (3 * leftT + rightT);
+                //take binary strings reps of rules, get char at index
+                int c = crossing.charAt(crossingIndex)-'0';
+                int t = turning.charAt(turningIndex)-'0';
+
+                //check for absent left thread for turning status
+                int l = t;
+                if(left == 'N' || left == 'f' || left == 'r') {
+                    l = 2;
+                }
+
+                //check for absent right thread for turning status
+                int r = t;
+                if(right == 'N' || right == 'b' || right == 'l') {
+                    r = 2;
+                }
+
+                //check if to make sure there are threads
+                if (l == 2 && r == 2) {
+                    c = 2;
+                }
+
+                map.put("" + left + right, getOutputExpanded(l,r,c));
+            }
+        }
+    }
+
+    public void generateExpandedStates() {
+        states.add('B');
+        states.add('F');
+        states.add('R');
+        states.add('L');
+        states.add('b');
+        states.add('f');
+        states.add('r');
+        states.add('l');
+        states.add('N');
+    }
+    public static int getCrossingStatusExpanded(char cell) {
+        return switch (cell) {
+            case 'B', 'R' -> 0;
+            case 'F', 'L' -> 1;
+            default -> 2;
+        };
+    }
+
+
+    public static int getTurningStatusExpanded(char cell) {
+        return switch (cell) {
+            case 'f', 'b', 'F', 'B' -> 0;
+            case 'l', 'r', 'L', 'R' -> 1;
+            default -> 2;
+        };
+    }
+
+    public static char getOutputExpanded(int leftTurning, int rightTurning, int crossing) {
+        int c = crossing * 100 + leftTurning * 10 + rightTurning;
+        //crossing: 0 R, 1 L, 2 No
+        //turning: 0 U, 1 S, 2 No
+        return switch (c) {
+            case 0 -> 'B';
+            case 100 -> 'F';
+            case 11 -> 'R';
+            case 111 -> 'L';
+            case 220 -> 'b';
+            case 202 -> 'f';
+            case 221 -> 'l';
+            case 212 -> 'r';
+            default -> 'N';
+        };
     }
 
 }
