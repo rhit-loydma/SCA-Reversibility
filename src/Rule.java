@@ -245,10 +245,10 @@ public class Rule {
         for(char left: states) {
             for(char right: states) {
                 //need to get crossing and turning status of each cell
-                int leftC = getTopThreadExpanded(left);
-                int leftT = getTurningStatusExpanded(left);
-                int rightC = getTopThreadExpanded(right);
-                int rightT = getTurningStatusExpanded(right);
+                int leftC = getTopThreadLeft(left);
+                int leftT = getTurningStatusLeft(left);
+                int rightC = getTopThreadRight(right);
+                int rightT = getTurningStatusRight(right);
                 //use those to calculate indexes
                 int crossingIndex = 3 * leftC + rightC;
                 int turningIndex = 3 * leftT + rightT;
@@ -258,13 +258,13 @@ public class Rule {
 
                 //check for absent left thread for turning status
                 int l = t;
-                if(left == 'N' || left == 'f' || left == 'r') {
+                if(left == 'N' || left == 'f' || left == 'l') {
                     l = 2;
                 }
 
                 //check for absent right thread for turning status
                 int r = t;
-                if(right == 'N' || right == 'b' || right == 'l') {
+                if(right == 'N' || right == 'b' || right == 'r') {
                     r = 2;
                 }
 
@@ -299,20 +299,35 @@ public class Rule {
         states.add('l');
         states.add('N');
     }
-    public static int getTopThreadExpanded(char cell) {
+    public static int getTopThreadLeft(char cell) {
         return switch (cell) {
-            case 'B', 'R', 'b', 'r' -> 0;
-            case 'F', 'L', 'f', 'l' -> 1;
-            default -> 2;
+            case 'L', 'B', 'b' -> 0;
+            case 'F', 'R', 'r' -> 1;
+            default -> 2; //f , l , N
         };
     }
 
-
-    public static int getTurningStatusExpanded(char cell) {
+    public static int getTopThreadRight(char cell) {
         return switch (cell) {
-            case 'f', 'b', 'F', 'B' -> 0;
-            case 'l', 'r', 'L', 'R' -> 1;
-            default -> 2;
+            case 'L', 'B', 'l' -> 0;
+            case 'F', 'R', 'f' -> 1;
+            default -> 2; //b, r, N
+        };
+    }
+
+    public static int getTurningStatusLeft(char cell) {
+        return switch (cell) {
+            case 'b', 'F', 'B' -> 0;
+            case 'r', 'L', 'R' -> 1;
+            default -> 2; //f, l, N
+        };
+    }
+
+    public static int getTurningStatusRight(char cell) {
+        return switch (cell) {
+            case 'f', 'F', 'B' -> 0;
+            case 'l', 'L', 'R' -> 1;
+            default -> 2; //b, r, N
         };
     }
 
