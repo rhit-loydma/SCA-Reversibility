@@ -240,29 +240,6 @@ public class Row {
         HashSet<Row> set = new HashSet<>();
         for (String cur : a) {
             if (!this.parity) {
-//                char first = cur.charAt(0);
-//                char second = cur.charAt(1);
-//
-//                char last = cur.charAt(cur.length() - 1);
-//                char secondLast = cur.charAt(cur.length() - 2);
-//
-//                boolean l = false;
-//                for(char c: rule.states) {
-//                    if(rule.getNext(String.valueOf(first + c)) == second) {
-//                        l = true;
-//                    }
-//                }
-//
-//                boolean r = false;
-//                for(char c: rule.states) {
-//                    if(rule.getNext(String.valueOf(c + last)) == secondLast) {
-//                        r = true;
-//                    }
-//                }
-//
-//                if(l && r) {
-//                    set.add(new Row(cur.substring(1, cur.length() - 1).toCharArray(), this.rule, true, this.bc));
-//                }
                 char second = cur.charAt(0);
                 char secondLast = cur.charAt(cur.length()-1);
 
@@ -273,7 +250,7 @@ public class Row {
                     char last = chars[cur.length()-1];
                     if(rule.getNext(first + second+"") == this.cells[0]
                         && rule.getNext(secondLast + last + "") == this.cells[this.cells.length-1]) {
-                        set.add(curRow);
+                        set.add(row);
                     }
                 }
             } else {

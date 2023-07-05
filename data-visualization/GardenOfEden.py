@@ -20,7 +20,7 @@ for i in range(1, ROWS * COLS + 1):
             collections.append(list(map(lambda x: float(x)//(0.01*pow(4,i)), pts)))
 
     axs.append(fig.add_subplot(ROWS, COLS, i))
-    axs[i-1].imshow(collections, origin='lower', cmap=plt.colormaps['BuPu'], vmin=0, vmax=100)
+    axs[i-1].imshow(collections, origin='lower', cmap=plt.colormaps['BuPu'], norm="log")
     axs[i-1].set_title('Width = ' + str(i), fontsize=10)
 
 fig.tight_layout()
