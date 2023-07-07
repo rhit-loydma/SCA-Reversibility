@@ -203,7 +203,7 @@ public class Main {
         }
 
         String bc = config.getBoundaryCondition();
-        if(logParity && (bc.equals("reflect") || bc.equals("previous"))) {
+        if(logParity && (bc.equals("reflect") || bc.equals("previous") || bc.equals("copy"))) {
             filename += "_" + config.getParity();
         }
 

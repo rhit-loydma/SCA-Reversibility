@@ -71,8 +71,8 @@ public class Row {
      */
     public Row getSuccessor() {
         return switch (this.bc) {
-            case "wrap" -> this.getSuccessorWrap();
-            case "reflect" -> this.getSuccessorReflect();
+            case "periodic" -> this.getSuccessorWrap();
+            case "reflect", "copy" -> this.getSuccessorReflect();
             case "previous" -> this.getSuccessorPrevious();
             default -> this.getSuccessorNone();
         };
@@ -107,11 +107,17 @@ public class Row {
             newCells = new char[this.cells.length + 1];
 
             //get left edge
-            char left = getReflectedCell(this.cells[0]);
+            char left = this.cells[0];
+            if(this.bc.equals("reflect")) {
+                left = getReflectedCell(left);
+            }
             newCells[0] = this.rule.getNext("" + left + this.cells[0]);
 
             //get right edge
-            char right = getReflectedCell(this.cells[this.cells.length-1]);
+            char right = this.cells[this.cells.length-1];
+            if(this.bc.equals("reflect")) {
+                right = getReflectedCell(right);
+            }
             newCells[this.cells.length] = this.rule.getNext("" + this.cells[this.cells.length-1] + right);
 
             offset = 1;
@@ -156,7 +162,18 @@ public class Row {
             case 'L' -> { return 'R'; }
             case 'R' -> { return 'L'; }
             case 'F' -> { return 'B'; }
-            default -> {return 'F'; }
+            case 'B' -> {return 'F';}
+            case 'l' -> { return 'r'; }
+            case 'r' -> { return 'l'; }
+            case 'f' -> { return 'b'; }
+            case 'b' -> {return 'f';}
+            case Rule.NNN -> {return Rule.NNN;}
+            case Rule.SNN -> {return Rule.NSN;}
+            case Rule.NSN -> {return Rule.SNN;}
+            case Rule.UNN -> {return Rule.NUN;}
+            case Rule.NUN -> {return Rule.UNN;}
+            case Rule.UUN -> {return Rule.UUN;}
+            default -> {return 'N'; }
         }
     }
 
@@ -196,8 +213,8 @@ public class Row {
         }
 
         return switch (this.bc) {
-            case "wrap" -> this.findPredecessorsWrap(a);
-            case "reflect" -> this.findPredecessorsReflect(a);
+            case "periodic" -> this.findPredecessorsWrap(a);
+            case "reflect", "copy" -> this.findPredecessorsReflect(a);
             case "previous" -> this.findPredecessorsPrevious(a);
             default -> this.findPredecessorsNone(a);
         };
@@ -226,7 +243,16 @@ public class Row {
                 char last = cur.charAt(cur.length() - 1);
                 char secondLast = cur.charAt(cur.length() - 2);
 
-                if (first == getReflectedCell(second) && last == getReflectedCell(secondLast)) {
+                char leftBoundary;
+                char rightBoundary;
+                if(this.bc.equals("reflect")) {
+                    leftBoundary = getReflectedCell(second);
+                    rightBoundary = getReflectedCell(secondLast);
+                } else {
+                    leftBoundary = first;
+                    rightBoundary = last;
+                }
+                if (first == leftBoundary && last == rightBoundary) {
                     set.add(new Row(cur.substring(1, cur.length() - 1).toCharArray(), this.rule, true, this.bc));
                 }
             } else {

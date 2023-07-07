@@ -24,6 +24,7 @@ public class Rule {
         this.map = new HashMap<>();
         this.states = new ArrayList<>();
         this.maxT = 16;
+        this.maxC = 16;
         switch (mode) {
             case ("wolfram") -> generateRuleMapWolfram();
             case ("original") -> {

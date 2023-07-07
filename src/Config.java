@@ -110,7 +110,7 @@ public class Config {
 
     public String getBoundaryCondition(){
         String input = this.prop.getProperty("boundaryCondition");
-        String[] vals = new String[]{"wrap", "reflect", "previous", "none"};
+        String[] vals = new String[]{"periodic", "reflect", "copy", "previous", "null"};
         return this.validateParam("boundaryCondition",input, vals);
     }
 
