@@ -217,6 +217,25 @@ public class Rule {
         return sb.toString();
     }
 
+    public boolean isBalanced() {
+        HashMap<Character, Integer> counts = new HashMap<>();
+        for(char c: states) {
+            counts.put(c,0);
+        }
+        for(char l: states) {
+            for(char r: states) {
+                char state = map.get("" + l + r);
+                counts.put(state,counts.get(state) + 1);
+            }
+        }
+        for(char c: states) {
+            if(counts.get(c) != states.size()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static String getDebugColor(char c) {
         return switch (c) {
             case 'B', 'R', 'F', 'L', UUN -> "\u001B[32m"; //green, 2 strands

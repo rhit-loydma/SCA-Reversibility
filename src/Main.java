@@ -64,6 +64,7 @@ public class Main {
     }
 
     public static int performComputation(Rule rule, int width) {
+        outputMessage("\n"+rule.toDebugString(), 4);
         String bc = config.getBoundaryCondition();
         boolean parity = config.getParity();
         switch (config.getType()) {
@@ -71,6 +72,9 @@ public class Main {
                 char[] start = config.getPatternString();
                 int height = config.getPatternHeight();
                 return generatePattern(rule, start, height, bc);
+            }
+            case ("balanced") -> {
+                return checkBalanced(rule);
             }
             case ("surjective") -> {
                 return checkSurjective(rule);
@@ -99,12 +103,20 @@ public class Main {
         }
         System.out.println(sb.toString());
         outputMessage(sb2.toString(), 1);
-        outputMessage("\n"+rule.toDebugString(), 4);
         return 0;
     }
 
+    public static int checkBalanced(Rule rule) {
+        if(rule.isBalanced()) {
+            outputMessage("Rule " + rule.toString() + " is balanced", 2);
+            return 1;
+        } else {
+            outputMessage("Rule " + rule.toString() + " is not balanced", 3);
+            return 0;
+        }
+    }
+
     public static int checkSurjective(Rule rule) {
-        outputMessage("\n"+rule.toDebugString(), 4);
         Node n = new Node(rule);
         if(n.isSurjective()) {
             outputMessage("Rule " + rule.number + " is surjective", 2);
@@ -116,7 +128,6 @@ public class Main {
     }
 
     public static int checkInjective(Rule rule) {
-        outputMessage("\n"+rule.toDebugString(), 4);
         SequentTable table = new SequentTable(rule);
         if(table.isInjective()) {
             outputMessage("Rule " + rule.number + " is injective", 2);
@@ -145,7 +156,6 @@ public class Main {
 //            }
             val += r.numTwins(method);
         }
-        outputMessage("\n"+rule.toDebugString(), 4);
         return (int) val;
     }
 
@@ -170,7 +180,6 @@ public class Main {
         for(Row r: nonGoes) {
             outputMessage("  " + r.toString(), 5);;
         }
-        outputMessage("\n"+rule.toDebugString(), 4);
         return goes.size();
     }
 
@@ -190,7 +199,7 @@ public class Main {
         String type = config.getType();
         boolean logParity = false;
         switch (type) {
-            case "injective", "surjective" -> filename += config.getMode() + "_" + type;
+            case "injective", "surjective", "balanced" -> filename += config.getMode() + "_" + type;
             case "twins" -> {
                 filename += config.getMode() + "/" + width + "_" + config.getCountingMethod() + "_" + config.getBoundaryCondition();
                 logParity = true;

@@ -20,7 +20,7 @@ public class Config {
     }
     public String getType(){
         String input = this.prop.getProperty("type");
-        String[] vals = new String[]{"pattern", "surjective", "injective", "GoE", "twins"};
+        String[] vals = new String[]{"pattern", "balanced", "surjective", "injective", "GoE", "twins"};
         return this.validateParam("type",input, vals);
     }
 
@@ -116,18 +116,18 @@ public class Config {
 
     //section: pattern experiment params
     public char[] getPatternString() {
-        String[] vals = switch (getMode()) {
-            case ("expanded") -> new String[]{Rule.SNN + "", Rule.NNN + "", Rule.NSN + "",
-                    Rule.UNN + "", Rule.UUN + "", Rule.NUN + "",
-                    Rule.SSR + "", Rule.SSL + ""};
-            case ("simplified") -> new String[]{"L", "R", "F", "B"};
-            default -> new String[]{"0", "1"};
-        };
+//        String[] vals = switch (getMode()) {
+//            case ("original") -> new String[]{Rule.SNN + "", Rule.NNN + "", Rule.NSN + "",
+//                    Rule.UNN + "", Rule.UUN + "", Rule.NUN + "",
+//                    Rule.SSR + "", Rule.SSL + ""};
+//            case ("simplified") -> new String[]{"L", "R", "F", "B"};
+//            default -> new String[]{"0", "1"};
+//        };
         String input = this.prop.getProperty("pattern.startingString");
         char[] cells = input.toCharArray();
-        for(int i = 0; i < cells.length; i++) {
-            validateParam("pattern.StartingString cell " + i, ""+cells[i], vals);
-        }
+//        for(int i = 0; i < cells.length; i++) {
+//            validateParam("pattern.StartingString cell " + i, ""+cells[i], vals);
+//        }
         return input.toCharArray();
     }
 
