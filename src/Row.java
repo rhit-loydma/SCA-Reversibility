@@ -167,12 +167,12 @@ public class Row {
             case 'r' -> { return 'l'; }
             case 'f' -> { return 'b'; }
             case 'b' -> {return 'f';}
-            case Rule.NNN -> {return Rule.NNN;}
-            case Rule.SNN -> {return Rule.NSN;}
-            case Rule.NSN -> {return Rule.SNN;}
-            case Rule.UNN -> {return Rule.NUN;}
-            case Rule.NUN -> {return Rule.UNN;}
-            case Rule.UUN -> {return Rule.UUN;}
+            case OriginalRule.NNN -> {return OriginalRule.NNN;}
+            case OriginalRule.SNN -> {return OriginalRule.NSN;}
+            case OriginalRule.NSN -> {return OriginalRule.SNN;}
+            case OriginalRule.UNN -> {return OriginalRule.NUN;}
+            case OriginalRule.NUN -> {return OriginalRule.UNN;}
+            case OriginalRule.UUN -> {return OriginalRule.UUN;}
             default -> {return 'N'; }
         }
     }

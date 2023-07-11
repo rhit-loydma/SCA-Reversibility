@@ -37,11 +37,11 @@ public class Main {
                     if (crossing == -1) {
                         for (int j = 0; j < maxC; j++) {
                             outputMessage("Crossing Rule: " + j, 3);
-                            arr[i][j] = performComputation(new Rule(mode, i * maxC + j), w);
+                            arr[i][j] = performComputation(createRule(i * maxC + j), w);
                         }
                     } else {
                         outputMessage("Crossing Rule: " + crossing, 3);
-                        performComputation(new Rule(mode, i * maxC + crossing), w);
+                        performComputation(createRule(i * maxC + crossing), w);
                     }
                 }
             } else {
@@ -49,11 +49,11 @@ public class Main {
                 if (crossing == -1) {
                     for (int j = 0; j < maxC; j++) {
                         outputMessage("Crossing Rule: " + j, 3);
-                        performComputation(new Rule(mode, turning * maxC + j), w);
+                        performComputation(createRule(turning * maxC + j), w);
                     }
                 } else {
                     outputMessage("Crossing Rule: " + crossing, 3);
-                    performComputation(new Rule(mode, turning * maxC + crossing), w);
+                    performComputation(createRule(turning * maxC + crossing), w);
                 }
             }
             if(config.getLogging()) {
@@ -61,6 +61,16 @@ public class Main {
             }
         }
 
+    }
+
+    public static Rule createRule(int number) {
+        String mode = config.getMode();
+        switch (mode) {
+            case "wolfram" -> { return new WolframRule(number); }
+            case "original" -> { return new OriginalRule(number); }
+            case "expanded" -> { return new ExpandedRule(number); }
+            default -> { return new SimplifiedRule(number); }
+        }
     }
 
     public static int performComputation(Rule rule, int width) {
