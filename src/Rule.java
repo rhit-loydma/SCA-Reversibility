@@ -72,6 +72,7 @@ public abstract class Rule {
                 counts.put(state, counts.get(state) + 1);
             }
         }
+        //System.out.println(counts.toString());
         for (char c : states) {
             if (counts.get(c) != states.size()) {
                 return false;

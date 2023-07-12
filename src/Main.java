@@ -20,24 +20,42 @@ public class Main {
         String mode = config.getMode();
         if(mode.equals("expanded")) {
             maxT = 256;
-        } else if (mode.equals("original")) {
+        } else if (mode.equals("original") || mode.equals("totalistic")) {
             maxT = 512;
             maxC = 512;
+        } else if (mode.equals("multicolored")) {
+            maxT = 65536;
+            maxC = 65536;
         }
-        int[][] arr = new int[maxT][maxC];
+        int[] line;
+        String filename = "";
+        FileWriter file = null;
 
         int crossing = config.getCrossingRule();
         int turning = config.getTurningRule();
 
         for(int w = start; w <= end; w++) {
             outputMessage(w + " " + java.time.LocalTime.now(), 1);
+            if(config.getLogging()){
+                filename = getFilename(w);
+                try {
+                    file = new FileWriter(filename);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
             if (turning == -1) {
                 for (int i = 0; i < maxT; i++) {
                     outputMessage("Turning Rule: " + i, 2);
                     if (crossing == -1) {
+                        line = new int[maxC];
                         for (int j = 0; j < maxC; j++) {
                             outputMessage("Crossing Rule: " + j, 3);
-                            arr[i][j] = performComputation(createRule(i * maxC + j), w);
+                            line[j] = performComputation(createRule(i * maxC + j), w);
+                        }
+                        if(config.getLogging()) {
+                            logData(file, line);
                         }
                     } else {
                         outputMessage("Crossing Rule: " + crossing, 3);
@@ -56,8 +74,13 @@ public class Main {
                     performComputation(createRule(turning * maxC + crossing), w);
                 }
             }
-            if(config.getLogging()) {
-                handleLogging(arr, w);
+
+            if(config.getLogging()){
+                try {
+                    file.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -69,6 +92,8 @@ public class Main {
             case "wolfram" -> { return new WolframRule(number); }
             case "original" -> { return new OriginalRule(number); }
             case "expanded" -> { return new ExpandedRule(number); }
+            case "totalistic" -> { return new TotalisticRule(number); }
+            case "multicolored" -> { return new MulticoloredRule(number); }
             default -> { return new SimplifiedRule(number); }
         }
     }
@@ -118,34 +143,36 @@ public class Main {
 
     public static int checkBalanced(Rule rule) {
         if(rule.isBalanced()) {
-            outputMessage("Rule " + rule.toString() + " is balanced", 2);
+            outputMessage(rule.toString() + " is balanced", 2);
             return 1;
         } else {
-            outputMessage("Rule " + rule.toString() + " is not balanced", 3);
+            outputMessage(rule.toString() + " is not balanced", 3);
             return 0;
         }
     }
 
     public static int checkSurjective(Rule rule) {
-        Node n = new Node(rule);
-        if(n.isSurjective()) {
-            outputMessage("Rule " + rule.number + " is surjective", 2);
-            return 1;
-        } else {
-            outputMessage("Rule " + rule.number + " is not surjective", 3);
-            return 0;
+        if(rule.isBalanced()) {
+            Node n = new Node(rule);
+            if(n.isSurjective()) {
+                outputMessage(rule.toString() + " is surjective", 2);
+                return 1;
+            }
         }
+        outputMessage(rule.toString() + " is not surjective", 3);
+        return 0;
     }
 
     public static int checkInjective(Rule rule) {
-        SequentTable table = new SequentTable(rule);
-        if(table.isInjective()) {
-            outputMessage("Rule " + rule.number + " is injective", 2);
-            return 1;
-        } else {
-            outputMessage("Rule " + rule.number + " is not injective", 3);
-            return 0;
+        if(rule.isBalanced()) {
+            SequentTable table = new SequentTable(rule);
+            if(table.isInjective()) {
+                outputMessage(rule.toString() + " is injective", 2);
+                return 1;
+            }
         }
+        outputMessage(rule.toString() + " is not injective", 3);
+        return 0;
     }
 
     public static int findTwins(Rule rule, int width, String boundaryCondition, boolean parity, int method) {
@@ -203,7 +230,7 @@ public class Main {
         }
     }
 
-    public static void handleLogging(int[][] arr, int width) {
+    public static String getFilename(int width) {
         String filename = "data/" + config.getType() + "/";
 
         String type = config.getType();
@@ -218,7 +245,7 @@ public class Main {
                 filename += config.getMode() + "/" + width + "_" + config.getBoundaryCondition();
                 logParity = true;
             }
-            default -> { return; }
+            default -> { return ""; }
         }
 
         String bc = config.getBoundaryCondition();
@@ -227,34 +254,31 @@ public class Main {
         }
 
         filename += ".csv";
-        logData(filename,arr);
+        return filename;
     }
 
-    public static void logData(String filename, int[][] data) {
-        try {
-            String[] parts = filename.split("/");
-            String soFar = "";
-            for(int i = 0; i < parts.length - 1; i++) {
-                soFar += parts[i] + "/";
-                File directory = new File(soFar);
-                if (! directory.exists()){
-                    directory.mkdir();
-                }
+    public static void makeDirectories(String filename) {
+        String[] parts = filename.split("/");
+        String soFar = "";
+        for(int i = 0; i < parts.length - 1; i++) {
+            soFar += parts[i] + "/";
+            File directory = new File(soFar);
+            if (! directory.exists()){
+                directory.mkdir();
             }
+        }
+    }
 
-            FileWriter file = new FileWriter(filename);
+    public static void logData(FileWriter file, int[] data) {
+        try {
             StringBuilder sb = new StringBuilder();
             for(int i = 0; i < data.length; i++) {
-                for(int j = 0; j < data[0].length; j++) {
-                    sb.append(data[i][j]);
-                    sb.append(',');
-                }
-                sb.setLength(sb.length()-1);
-                sb.append('\n');
+                sb.append(data[i]);
+                sb.append(',');
             }
             sb.setLength(sb.length()-1);
+            sb.append('\n');
             file.write(sb.toString());
-            file.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

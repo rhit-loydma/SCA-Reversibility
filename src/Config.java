@@ -26,7 +26,7 @@ public class Config {
 
     public String getMode(){
         String input = this.prop.getProperty("mode");
-        String[] vals = new String[]{"expanded", "simplified", "wolfram", "original"};
+        String[] vals = new String[]{"expanded", "simplified", "wolfram", "original", "totalistic", "multicolored"};
         return this.validateParam("mode",input, vals);
     }
 
@@ -68,8 +68,10 @@ public class Config {
             int max = 15;
             if(getMode().equals("expanded")) {
                 max = 255;
-            } else if(getMode().equals("original")) {
+            } else if(getMode().equals("original") || getMode().equals("totalistic")) {
                 max = 511;
+            } else if (getMode().equals("multicolored")) {
+                max = 65535;
             }
             if (input < 0 || input > max) {
                 System.out.println("turningRule input must be between 0 and " + max);
@@ -90,8 +92,10 @@ public class Config {
         try {
             int input = Integer.parseInt(this.prop.getProperty("crossingRule"));
             int max = 15;
-            if(getMode().equals("original")) {
+            if(getMode().equals("original") || getMode().equals("totalistic")) {
                 max = 511;
+            } else if (getMode().equals("multicolored")) {
+                max = 65535;
             }
             if (input < 0 || input > max) {
                 System.out.println("crossingRule input must be between 0 and " + max);
