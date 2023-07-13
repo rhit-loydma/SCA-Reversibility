@@ -80,4 +80,20 @@ public abstract class Rule {
         }
         return true;
     }
+
+    public boolean isSurjective() {
+        if(!this.isBalanced()) {
+            return false;
+        }
+        Node n = new Node(this);
+        return n.isSurjective();
+    }
+
+    public boolean isInjective() {
+        if(!this.isSurjective()) {
+            return false;
+        }
+        SequentTable table = new SequentTable(this);
+        return table.isInjective();
+    }
 }

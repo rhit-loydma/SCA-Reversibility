@@ -138,6 +138,7 @@ public class Main {
         }
         System.out.println(sb.toString());
         outputMessage(sb2.toString(), 1);
+//        System.out.println(r.findPredecessors().toString());
         return 0;
     }
 
@@ -145,31 +146,24 @@ public class Main {
         if(rule.isBalanced()) {
             outputMessage(rule.toString() + " is balanced", 2);
             return 1;
-        } else {
-            outputMessage(rule.toString() + " is not balanced", 3);
-            return 0;
         }
+        outputMessage(rule.toString() + " is not balanced", 3);
+        return 0;
     }
 
     public static int checkSurjective(Rule rule) {
-        if(rule.isBalanced()) {
-            Node n = new Node(rule);
-            if(n.isSurjective()) {
-                outputMessage(rule.toString() + " is surjective", 2);
-                return 1;
-            }
+        if(rule.isSurjective()) {
+            outputMessage(rule.toString() + " is surjective", 2);
+            return 1;
         }
         outputMessage(rule.toString() + " is not surjective", 3);
         return 0;
     }
 
     public static int checkInjective(Rule rule) {
-        if(rule.isBalanced()) {
-            SequentTable table = new SequentTable(rule);
-            if(table.isInjective()) {
-                outputMessage(rule.toString() + " is injective", 2);
-                return 1;
-            }
+        if(rule.isInjective()) {
+            outputMessage(rule.toString() + " is injective", 2);
+            return 1;
         }
         outputMessage(rule.toString() + " is not injective", 3);
         return 0;

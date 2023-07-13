@@ -16,14 +16,6 @@ public class SequentTable {
 	}
 
 	public boolean isInjective() {
-		//pre-check for surjectivity
-		Node n = new Node(this.rule);
-		if (!n.isSurjective()) {
-			return false;
-		}
-
-		//call helper methods for steps
-		//should short circuit?
 		return this.populateTable() && this.reduce() && this.assignWeights() && this.checkSameLeftMost();
 	}
 
