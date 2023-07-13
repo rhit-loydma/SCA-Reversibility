@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public abstract class Rule {
 
@@ -95,5 +92,42 @@ public abstract class Rule {
         }
         SequentTable table = new SequentTable(this);
         return table.isInjective();
+    }
+
+    public void findOrphans(int stoppingWidth, HashMap<Integer, ArrayList<String>> map) {
+        String pattern;
+        Queue<String> q = new LinkedList<>();
+        q.add("");
+        while(!q.isEmpty()) {
+//            System.out.println(q.toString());
+//            System.out.println(map.toString());
+            pattern = q.poll();
+            if(pattern.length() == 0) {
+                for(char c: this.states) {
+                    q.add(pattern+c);
+                }
+            } else if(pattern.length() <= stoppingWidth) {
+                boolean check = true;
+                for(ArrayList<String> list : map.values()) {
+                    for(String s: list) {
+                        if(pattern.contains(s)) {
+                            check = false;
+                            break;
+                        }
+                    }
+                }
+                if(check) {
+                    Row r = new Row(pattern.toCharArray(), this, false, "null");
+                    if(r.findPredecessors().isEmpty()) { //found orphan
+                        map.get(pattern.length()).add(pattern);
+                    } else {
+                        for(char c: this.states) {
+                            q.add(pattern+c);
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }

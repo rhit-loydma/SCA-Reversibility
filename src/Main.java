@@ -5,13 +5,14 @@ import java.util.*;
 
 public class Main {
     static Config config;
+    static HashSet<String> prev;
 
     public static void main(String[] args) {
         config = new Config("config.properties");
 
         int start = config.getStartWidth();
         int end = start;
-        if(config.getType().equals("twins") || config.getType().equals("GoE")) {
+        if(config.getType().equals("twins") || config.getType().equals("GoE") || config.getType().equals("orphans")) {
             end = config.getEndWidth();
         }
 
@@ -39,6 +40,7 @@ public class Main {
             if(config.getLogging()){
                 filename = getFilename(w);
                 try {
+                    makeDirectories(filename);
                     file = new FileWriter(filename);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -120,6 +122,9 @@ public class Main {
             case ("twins") -> {
                 int method = config.getCountingMethod();
                 return findTwins(rule, width, bc, parity, method);
+            }
+            case ("orphans") -> {
+                return findOrphans(rule, width);
             }
             default -> {
                 return findGoEs(rule, width, bc, parity);
@@ -212,6 +217,21 @@ public class Main {
             outputMessage("  " + r.toString(), 5);;
         }
         return goes.size();
+    }
+
+    public static int findOrphans(Rule rule, int width) {
+        HashMap<Integer,ArrayList<String>> map = new HashMap<>();
+        for(int i = 0; i <= width; i++) {
+            map.put(i, new ArrayList<>());
+        }
+        rule.findOrphans(width, map);
+
+        ArrayList<String> orphans = map.get(width);
+        outputMessage(rule.toString() + " has " + orphans.size() + " orphans of width " + width, 4);
+        for(String r: orphans) {
+            outputMessage("  " + r, 5);
+        }
+        return orphans.size();
     }
 
     public static void generateStrings(ArrayList<Character> states, int width, String path, Container<String> configs) {
