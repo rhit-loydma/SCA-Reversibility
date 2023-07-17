@@ -21,6 +21,9 @@ public class Main {
         String mode = config.getMode();
         if(mode.equals("expanded")) {
             maxT = 256;
+        } else if (mode.equals("expanded2")) {
+            maxT = 256;
+            maxC = 256;
         } else if (mode.equals("original") || mode.equals("totalistic")) {
             maxT = 512;
             maxC = 512;
@@ -28,55 +31,50 @@ public class Main {
             maxT = 65536;
             maxC = 65536;
         }
+        ArrayList<Integer> crossing = getRules(config.getCrossingRule(), maxC);
+        ArrayList<Integer> turning = getRules(config.getTurningRule(), maxT);
+
         int[] line;
         String filename = "";
         FileWriter file = null;
 
-        int crossing = config.getCrossingRule();
-        int turning = config.getTurningRule();
-
         for(int w = start; w <= end; w++) {
             outputMessage(w + " " + java.time.LocalTime.now(), 1);
+
+            //file setup
             if(config.getLogging()){
                 filename = getFilename(w);
                 try {
                     makeDirectories(filename);
                     file = new FileWriter(filename);
+
+                    line = new int[crossing.size()+1];
+                    line[0] = -1;
+                    for(int j = 0; j < crossing.size(); j++) {
+                        line[j+1] = crossing.get(j);
+                    }
+                    logData(file,line);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
 
-            if (turning == -1) {
-                for (int i = 0; i < maxT; i++) {
-                    outputMessage("Turning Rule: " + i, 2);
-                    if (crossing == -1) {
-                        line = new int[maxC];
-                        for (int j = 0; j < maxC; j++) {
-                            outputMessage("Crossing Rule: " + j, 3);
-                            line[j] = performComputation(createRule(i * maxC + j), w);
-                        }
-                        if(config.getLogging()) {
-                            logData(file, line);
-                        }
-                    } else {
-                        outputMessage("Crossing Rule: " + crossing, 3);
-                        performComputation(createRule(i * maxC + crossing), w);
-                    }
+            //iterate through rules
+            for(int i: turning) {
+                outputMessage("Turning Rule: " + i, 2);
+                line = new int[crossing.size()+1];
+                line[0] =  i;
+                for(int j = 0; j < crossing.size(); j++) {
+                    int c = crossing.get(j);
+                    outputMessage("Crossing Rule: " + c, 3);
+                    line[j+ 1] = performComputation(createRule(i * maxC + c), w);
                 }
-            } else {
-                outputMessage("Turning Rule: " + turning, 2);
-                if (crossing == -1) {
-                    for (int j = 0; j < maxC; j++) {
-                        outputMessage("Crossing Rule: " + j, 3);
-                        performComputation(createRule(turning * maxC + j), w);
-                    }
-                } else {
-                    outputMessage("Crossing Rule: " + crossing, 3);
-                    performComputation(createRule(turning * maxC + crossing), w);
+                if(config.getLogging()) {
+                    logData(file, line);
                 }
             }
 
+            //close file
             if(config.getLogging()){
                 try {
                     file.close();
@@ -85,7 +83,34 @@ public class Main {
                 }
             }
         }
+    }
 
+    public static ArrayList<Integer> getRules(int input, int max) {
+      ArrayList<Integer> rules = new ArrayList<>();
+      switch (input) {
+          case -2: //bit-balanced
+              int length = (int) (Math.log(max) / Math.log(2));
+              ArrayList<Character> bits = new ArrayList<>();
+              for(int i = 0; i < ((double)length) / 2; i++) {
+                  bits.add('1');
+                  bits.add('0');
+              }
+              HashSet<String> c = new HashSet<>();
+              generateStringsNoRep(bits, length, "", c);
+              for(String s: c) {
+                  rules.add(Integer.parseInt(s, 2));
+              }
+              Collections.sort(rules);
+              break;
+          case -1: //all
+              for(int i = 0; i < max; i++) {
+                  rules.add(i);
+              }
+              break;
+          default:
+              rules.add(input);
+      }
+      return rules;
     }
 
     public static Rule createRule(int number) {
@@ -94,6 +119,7 @@ public class Main {
             case "wolfram" -> { return new WolframRule(number); }
             case "original" -> { return new OriginalRule(number); }
             case "expanded" -> { return new ExpandedRule(number); }
+            case "expanded2" -> { return new ExpandedRule2(number); }
             case "totalistic" -> { return new TotalisticRule(number); }
             case "multicolored" -> { return new MulticoloredRule(number); }
             default -> { return new SimplifiedRule(number); }
@@ -136,14 +162,14 @@ public class Main {
         StringBuilder sb = new StringBuilder(rule.toString() + "\n");
         StringBuilder sb2 = new StringBuilder();
         Row r = new Row(start, rule, false, boundaryCondition);
-        for(int i = 0; i < height; i++) {
-            sb.append(r.toString() + "     " + i + "\n");
-            sb2.append(r.toStringBracelet() + '\n');
-            r = r.getSuccessor();
-        }
-        System.out.println(sb.toString());
-        outputMessage(sb2.toString(), 1);
-//        System.out.println(r.findPredecessors().toString());
+//        for(int i = 0; i < height; i++) {
+//            sb.append(r.toString() + "     " + i + "\n");
+//            sb2.append(r.toStringBracelet() + '\n');
+//            r = r.getSuccessor();
+//        }
+//        System.out.println(sb.toString());
+//        outputMessage(sb2.toString(), 1);
+        System.out.println(r.findPredecessors().toString());
         return 0;
     }
 
@@ -241,6 +267,23 @@ public class Main {
         }
         for(Character s: states) {
             generateStrings(states, width - 1,path + s, configs);
+        }
+    }
+
+    public static void generateStringsNoRep(ArrayList<Character> states, int width, String path, HashSet<String> configs) {
+        if(width <= 0) {
+            configs.add(path);
+            return;
+        }
+        if(states.contains('1')) {
+            ArrayList<Character> newStates = new ArrayList<>(states);
+            newStates.remove((Object)'1');
+            generateStringsNoRep(newStates, width - 1,path + '1', configs);
+        }
+        if(states.contains('0')) {
+            ArrayList<Character> newStates = new ArrayList<>(states);
+            newStates.remove((Object)'0');
+            generateStringsNoRep(newStates, width - 1,path + '0', configs);
         }
     }
 

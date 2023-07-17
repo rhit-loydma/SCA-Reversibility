@@ -26,7 +26,7 @@ public class Config {
 
     public String getMode(){
         String input = this.prop.getProperty("mode");
-        String[] vals = new String[]{"expanded", "simplified", "wolfram", "original", "totalistic", "multicolored"};
+        String[] vals = new String[]{"expanded", "expanded2", "simplified", "wolfram", "original", "totalistic", "multicolored"};
         return this.validateParam("mode",input, vals);
     }
 
@@ -48,7 +48,7 @@ public class Config {
     public boolean getLogging() {
         String input = this.prop.getProperty("logging");
         if(input.equals("true")) {
-            if(!(this.getCrossingRule()==-1) || !(this.getTurningRule()==-1) || this.getType().equals("pattern")) {
+            if(!(this.getCrossingRule()<0) || !(this.getTurningRule()<0) || this.getType().equals("pattern")) {
                 System.out.println("logging can only occur on all rules and not in pattern mode");
                 System.exit(1);
             }
@@ -81,6 +81,8 @@ public class Config {
         } catch(NumberFormatException e) {
             if(this.prop.getProperty("turningRule").equals("ALL")) {
                 return -1;
+            } else if(this.prop.getProperty("turningRule").equals("BIT-BALANCED")) {
+                return -2;
             }
             System.out.println("turningRule input must be an int");
             System.exit(1);
@@ -105,6 +107,8 @@ public class Config {
         } catch(NumberFormatException e) {
             if(this.prop.getProperty("crossingRule").equals("ALL")) {
                 return -1;
+            } else if(this.prop.getProperty("crossingRule").equals("BIT-BALANCED")) {
+                return -2;
             }
             System.out.println("crossingRule input must be an int");
             System.exit(1);
