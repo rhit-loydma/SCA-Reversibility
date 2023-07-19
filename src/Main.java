@@ -1,6 +1,4 @@
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class Main {
@@ -99,6 +97,18 @@ public class Main {
     public static ArrayList<Integer> getRules(int input, int max) {
       ArrayList<Integer> rules = new ArrayList<>();
       switch (input) {
+          case -3: //from file
+              try {
+                  File file = new File("rulesToSearch.txt");
+                  Scanner reader = new Scanner(file);
+                  while (reader.hasNextLine()) {
+                      rules.add(Integer.parseInt(reader.nextLine()));
+                  }
+                  reader.close();
+              } catch (FileNotFoundException e) {
+                  e.printStackTrace();
+              }
+              break;
           case -2: //bit-balanced
               int length = (int) (Math.log(max) / Math.log(2));
               ArrayList<Character> bits = new ArrayList<>();

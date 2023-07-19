@@ -89,6 +89,8 @@ public class Config {
                 return -1;
             } else if(this.prop.getProperty("turningRule").equals("BIT-BALANCED")) {
                 return -2;
+            } else if(this.prop.getProperty("turningRule").equals("FROM-FILE")) {
+                return -3;
             }
             System.out.println("turningRule input must be an int");
             System.exit(1);
@@ -115,6 +117,8 @@ public class Config {
                 return -1;
             } else if(this.prop.getProperty("crossingRule").equals("BIT-BALANCED")) {
                 return -2;
+            } else if(this.prop.getProperty("crossingRule").equals("FROM-FILE")) {
+                return -3;
             }
             System.out.println("crossingRule input must be an int");
             System.exit(1);
