@@ -35,25 +35,29 @@ public class Main {
         ArrayList<Integer> turning = getRules(config.getTurningRule(), maxT);
 
         int[] line;
+        ArrayList<Integer> list;
         String filename = "";
+        int logging = config.getLoggingMode();
         FileWriter file = null;
 
         for(int w = start; w <= end; w++) {
             outputMessage(w + " " + java.time.LocalTime.now(), 1);
 
             //file setup
-            if(config.getLogging()){
+            if(logging!= 0){
                 filename = getFilename(w);
                 try {
                     makeDirectories(filename);
                     file = new FileWriter(filename);
 
-                    line = new int[crossing.size()+1];
-                    line[0] = -1;
-                    for(int j = 0; j < crossing.size(); j++) {
-                        line[j+1] = crossing.get(j);
+                    if(logging==1) { //headers for matrix logging
+                        line = new int[crossing.size()+1];
+                        line[0] = -1;
+                        for(int j = 0; j < crossing.size(); j++) {
+                            line[j+1] = crossing.get(j);
+                        }
+                        logDataMatrix(file,line);
                     }
-                    logData(file,line);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -64,18 +68,25 @@ public class Main {
                 outputMessage("Turning Rule: " + i, 2);
                 line = new int[crossing.size()+1];
                 line[0] =  i;
+                list = new ArrayList<>();
                 for(int j = 0; j < crossing.size(); j++) {
                     int c = crossing.get(j);
                     outputMessage("Crossing Rule: " + c, 3);
-                    line[j+ 1] = performComputation(createRule(i * maxC + c), w);
+                    int output = performComputation(createRule(i, c), w);
+                    line[j+1] = output;
+                    if(output == 1) {
+                        list.add(j);
+                    }
                 }
-                if(config.getLogging()) {
-                    logData(file, line);
+                if(logging== 1) {
+                    logDataMatrix(file, line);
+                } else if (logging == 2 && list.size() > 0) {
+                    logDataList(file, i, list);
                 }
             }
 
             //close file
-            if(config.getLogging()){
+            if(logging != 0){
                 try {
                     file.close();
                 } catch (IOException e) {
@@ -113,16 +124,16 @@ public class Main {
       return rules;
     }
 
-    public static Rule createRule(int number) {
+    public static Rule createRule(int t, int c) {
         String mode = config.getMode();
         switch (mode) {
-            case "wolfram" -> { return new WolframRule(number); }
-            case "original" -> { return new OriginalRule(number); }
-            case "expanded" -> { return new ExpandedRule(number); }
-            case "expanded2" -> { return new ExpandedRule2(number); }
-            case "totalistic" -> { return new TotalisticRule(number); }
-            case "multicolored" -> { return new MulticoloredRule(number); }
-            default -> { return new SimplifiedRule(number); }
+            case "wolfram" -> { return new WolframRule(c,t); }
+            case "original" -> { return new OriginalRule(c,t); }
+            case "expanded" -> { return new ExpandedRule(c,t); }
+            case "expanded2" -> { return new ExpandedRule2(c,t); }
+            case "totalistic" -> { return new TotalisticRule(c,t); }
+            case "multicolored" -> { return new MulticoloredRule(c,t); }
+            default -> { return new SimplifiedRule(c,t); }
         }
     }
 
@@ -326,11 +337,28 @@ public class Main {
         }
     }
 
-    public static void logData(FileWriter file, int[] data) {
+    public static void logDataMatrix(FileWriter file, int[] data) {
         try {
             StringBuilder sb = new StringBuilder();
             for(int i = 0; i < data.length; i++) {
                 sb.append(data[i]);
+                sb.append(',');
+            }
+            sb.setLength(sb.length()-1);
+            sb.append('\n');
+            file.write(sb.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void logDataList(FileWriter file, int rule, ArrayList<Integer> data) {
+        try {
+            StringBuilder sb = new StringBuilder();
+            sb.append(rule);
+            sb.append(":");
+            for(int i: data) {
+                sb.append(i);
                 sb.append(',');
             }
             sb.setLength(sb.length()-1);

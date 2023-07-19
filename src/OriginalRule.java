@@ -8,8 +8,8 @@ public class OriginalRule extends Rule{
     public static final char SSR = 'R';
     public static final char SSL = 'L';
 
-	public OriginalRule(int number) {
-		super(number);
+	public OriginalRule(int c, int t) {
+		super(c, t);
 	}
 
 	@Override
@@ -32,10 +32,7 @@ public class OriginalRule extends Rule{
 
 	@Override
 	public void generateRuleMap() {
-		String crossing = Integer.toString(this.number%maxC, 2);
 		crossing = "0".repeat(9 - crossing.length()) + crossing;
-
-		String turning = Integer.toString(this.number/maxC, 2);
 		turning = "0".repeat(9 - turning.length()) + turning;
 
 		for(char left: states) {

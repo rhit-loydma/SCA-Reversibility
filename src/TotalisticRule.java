@@ -1,6 +1,6 @@
 public class TotalisticRule extends Rule{
-	public TotalisticRule(int number) {
-		super(number);
+	public TotalisticRule(int c, int t) {
+		super(c, t);
 	}
 
 	@Override
@@ -31,10 +31,7 @@ public class TotalisticRule extends Rule{
 
 	@Override
 	public void generateRuleMap() {
-		String crossing = Integer.toString(this.number%maxC, 2);
 		crossing = "0".repeat(9 - crossing.length()) + crossing;
-
-		String turning = Integer.toString(this.number/maxC, 2);
 		turning = "0".repeat(9 - turning.length()) + turning;
 
 		for(char left: states) {

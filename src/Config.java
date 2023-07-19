@@ -45,21 +45,27 @@ public class Config {
         return 5;
     }
 
-    public boolean getLogging() {
+    public int getLoggingMode() {
         String input = this.prop.getProperty("logging");
-        if(input.equals("true")) {
-            if(!(this.getCrossingRule()<0) || !(this.getTurningRule()<0) || this.getType().equals("pattern")) {
+        if(input.equals("none")) {
+            return 0;
+        } else if(input.equals("matrix")) {
+            if(this.getType().equals("pattern")) {
                 System.out.println("logging can only occur on all rules and not in pattern mode");
                 System.exit(1);
             }
-            return true;
-        } else if(input.equals("false")) {
-            return false;
+            return 1;
+        } else if(input.equals("list")) {
+            if(this.getType().equals("pattern")) {
+                System.out.println("logging can only occur on all rules and not in pattern mode");
+                System.exit(1);
+            }
+            return 2;
         } else {
-            System.out.println("logging input must be 'true' or 'false'");
+            System.out.println("logging input must be 'none', 'matrix', or 'list'");
             System.exit(1);
         }
-        return false;
+        return 0;
     }
 
     public int getTurningRule() {

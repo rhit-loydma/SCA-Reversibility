@@ -1,7 +1,7 @@
 public class WolframRule extends Rule {
 
-	public WolframRule(int number) {
-		super(number);
+	public WolframRule(int c, int t) {
+		super(c, t);
 	}
 
 	@Override
@@ -17,7 +17,7 @@ public class WolframRule extends Rule {
 	}
 
 	public void generateRuleMap() {
-		String bin = Integer.toString(this.number, 2);
+		String bin = Integer.toString(t*16+c, 2);
 		bin = "0".repeat(8 - bin.length()) + bin;
 		for(int i = 0; i < 8; i++) {
 			String neighborhood = Integer.toBinaryString(i);

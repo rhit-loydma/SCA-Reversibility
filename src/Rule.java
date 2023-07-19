@@ -2,17 +2,23 @@ import java.util.*;
 
 public abstract class Rule {
 
-    int number;
     HashMap<String, Character> map;
     ArrayList<Character> states;
+    int t;
+    int c;
     int maxT;
     int maxC;
+    String crossing;
+    String turning;
 
-    public Rule(int number) {
-        this.number = number;
+    public Rule(int c, int t) {
         this.map = new HashMap<>();
         this.states = new ArrayList<>();
         this.setRuleCounts();
+        this.c = c;
+        this.crossing = Integer.toString(c, 2);
+        this.t = t;
+        this.turning = Integer.toString(t, 2);
         this.populateStates();
         this.generateRuleMap();
     }
@@ -31,7 +37,7 @@ public abstract class Rule {
     }
 
     public String toString() {
-        return "turning rule: " + this.number/maxC + ", crossing rule: " + this.number % maxC;
+        return "turning rule: " + this.t + ", crossing rule: " + this.c;
     }
 
     public String toDebugString(){

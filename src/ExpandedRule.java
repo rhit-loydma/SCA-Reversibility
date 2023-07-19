@@ -1,6 +1,6 @@
 public class ExpandedRule extends Rule{
-	public ExpandedRule(int number) {
-		super(number);
+	public ExpandedRule(int c, int t) {
+		super(c, t);
 	}
 
 	@Override
@@ -24,13 +24,11 @@ public class ExpandedRule extends Rule{
 
 	@Override
 	public void generateRuleMap() {
-		String crossing = Integer.toString(this.number%maxC, 2);
 		//get 4-bit rule
 		crossing = "0".repeat(4 - crossing.length()) + crossing;
 		//fill in pre-determined bits
 		crossing = crossing.substring(0,2) + "1" + crossing.substring(2,4) + "1002";
 
-		String turning = Integer.toString(this.number/maxC, 2);
 		//get 8-bit rule
 		turning = "0".repeat(8 - turning.length()) + turning;
 		//fill in pre-determined bits
