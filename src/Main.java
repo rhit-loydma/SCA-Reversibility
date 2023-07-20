@@ -3,7 +3,6 @@ import java.util.*;
 
 public class Main {
     static Config config;
-    static HashSet<String> prev;
 
     public static void main(String[] args) {
         config = new Config("config.properties");
@@ -17,21 +16,23 @@ public class Main {
         int maxT = 16;
         int maxC = 16;
         String mode = config.getMode();
-        if(mode.equals("weaving")) {
-            maxT = 256;
-        } else if (mode.equals("original") || mode.equals("totalistic")) {
-            maxT = 512;
-            maxC = 512;
-        } else if (mode.equals("multicolored")) {
-            maxT = 65536;
-            maxC = 65536;
+        switch (mode) {
+            case "weaving" -> maxT = 256;
+            case "original", "totalistic" -> {
+                maxT = 512;
+                maxC = 512;
+            }
+            case "multicolored" -> {
+                maxT = 65536;
+                maxC = 65536;
+            }
         }
         ArrayList<Integer> crossing = getRules(config.getCrossingRule(), maxC);
         ArrayList<Integer> turning = getRules(config.getTurningRule(), maxT);
 
         int[] line;
         ArrayList<Integer> list;
-        String filename = "";
+        String filename;
         int logging = config.getLoggingMode();
         FileWriter file = null;
 
@@ -81,7 +82,7 @@ public class Main {
             }
 
             //close file
-            if(logging != 0){
+            if(logging != 0 && file != null){
                 try {
                     file.close();
                 } catch (IOException e) {
@@ -93,41 +94,40 @@ public class Main {
 
     public static ArrayList<Integer> getRules(int input, int max) {
       ArrayList<Integer> rules = new ArrayList<>();
-      switch (input) {
-          case -3: //from file
-              try {
-                  File file = new File("rulesToSearch.txt");
-                  Scanner reader = new Scanner(file);
-                  while (reader.hasNextLine()) {
-                      rules.add(Integer.parseInt(reader.nextLine()));
-                  }
-                  reader.close();
-              } catch (FileNotFoundException e) {
-                  e.printStackTrace();
-              }
-              break;
-          case -2: //bit-balanced
-              int length = (int) (Math.log(max) / Math.log(2));
-              ArrayList<Character> bits = new ArrayList<>();
-              for(int i = 0; i < ((double)length) / 2; i++) {
-                  bits.add('1');
-                  bits.add('0');
-              }
-              HashSet<String> c = new HashSet<>();
-              generateStringsNoRep(bits, length, "", c);
-              for(String s: c) {
-                  rules.add(Integer.parseInt(s, 2));
-              }
-              Collections.sort(rules);
-              break;
-          case -1: //all
-              for(int i = 0; i < max; i++) {
-                  rules.add(i);
-              }
-              break;
-          default:
-              rules.add(input);
-      }
+        switch (input) {
+            case -3 -> { //from file
+                try {
+                    File file = new File("rulesToSearch.txt");
+                    Scanner reader = new Scanner(file);
+                    while (reader.hasNextLine()) {
+                        rules.add(Integer.parseInt(reader.nextLine()));
+                    }
+                    reader.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+            case -2 -> { //bit-balanced
+                int length = (int) (Math.log(max) / Math.log(2));
+                ArrayList<Character> bits = new ArrayList<>();
+                for (int i = 0; i < ((double) length) / 2; i++) {
+                    bits.add('1');
+                    bits.add('0');
+                }
+                HashSet<String> c = new HashSet<>();
+                generateStringsNoRep(bits, length, "", c);
+                for (String s : c) {
+                    rules.add(Integer.parseInt(s, 2));
+                }
+                Collections.sort(rules);
+            }
+            case -1 -> { //all
+                for (int i = 0; i < max; i++) {
+                    rules.add(i);
+                }
+            }
+            default -> rules.add(input);
+        }
       return rules;
     }
 
@@ -152,6 +152,10 @@ public class Main {
                 char[] start = config.getPatternString();
                 int height = config.getPatternHeight();
                 return generatePattern(rule, start, height, bc);
+            }
+            case ("predecessors") -> {
+                char[] start = config.getPatternString();
+                return generatePredecessors(rule, start, bc);
             }
             case ("balanced") -> {
                 return checkBalanced(rule);
@@ -179,41 +183,52 @@ public class Main {
         StringBuilder sb = new StringBuilder(rule.toString() + "\n");
         StringBuilder sb2 = new StringBuilder();
         Row r = new Row(start, rule, false, boundaryCondition);
-//        for(int i = 0; i < height; i++) {
-//            sb.append(r.toString() + "     " + i + "\n");
-//            sb2.append(r.toStringBracelet() + '\n');
-//            r = r.getSuccessor();
-//        }
-//        System.out.println(sb.toString());
-//        outputMessage(sb2.toString(), 1);
-        System.out.println(r.findPredecessors().toString());
+        for(int i = 0; i < height; i++) {
+            sb.append(r.toString()).append("     ").append(i).append("\n");
+            sb2.append(r.toStringBracelet()).append('\n');
+            r = r.getSuccessor();
+        }
+        System.out.println(sb);
+        outputMessage(sb2.toString(), 1);
+        return 0;
+    }
+
+    public static int generatePredecessors(Rule rule, char[] start, String boundaryCondition) {
+        StringBuilder sb = new StringBuilder(rule.toString() + "\n");
+        Row r = new Row(start, rule, false, boundaryCondition);
+        HashSet<Row> pred = r.findPredecessors();
+        outputMessage("Row " + r.toString() + " has " + pred.size() + " predecessors under " + rule, 1);
+        for(Row p: pred) {
+            sb.append("     ").append(p.toString()).append("\n");
+        }
+        outputMessage(sb.toString(), 3);
         return 0;
     }
 
     public static int checkBalanced(Rule rule) {
         if(rule.isBalanced()) {
-            outputMessage(rule.toString() + " is balanced", 2);
+            outputMessage(rule + " is balanced", 2);
             return 1;
         }
-        outputMessage(rule.toString() + " is not balanced", 3);
+        outputMessage(rule + " is not balanced", 3);
         return 0;
     }
 
     public static int checkSurjective(Rule rule) {
         if(rule.isSurjective()) {
-            outputMessage(rule.toString() + " is surjective", 2);
+            outputMessage(rule + " is surjective", 2);
             return 1;
         }
-        outputMessage(rule.toString() + " is not surjective", 3);
+        outputMessage(rule + " is not surjective", 3);
         return 0;
     }
 
     public static int checkInjective(Rule rule) {
         if(rule.isInjective()) {
-            outputMessage(rule.toString() + " is injective", 2);
+            outputMessage(rule + " is injective", 2);
             return 1;
         }
-        outputMessage(rule.toString() + " is not injective", 3);
+        outputMessage(rule + " is not injective", 3);
         return 0;
     }
 
@@ -251,13 +266,13 @@ public class Main {
                 nonGoes.add(r);
             }
         }
-        outputMessage(rule.toString() + " width " + width + " has " + goes.size() + " GoE(s)", 4);
+        outputMessage(rule + " width " + width + " has " + goes.size() + " GoE(s)", 4);
         for(Row r: goes) {
             outputMessage("  " + r.toString(), 5);
         }
-        outputMessage(rule.toString() + " width " + width + " has " + nonGoes.size() + " non-GoE(s)", 4);
+        outputMessage(rule + " width " + width + " has " + nonGoes.size() + " non-GoE(s)", 4);
         for(Row r: nonGoes) {
-            outputMessage("  " + r.toString(), 5);;
+            outputMessage("  " + r.toString(), 5);
         }
         return goes.size();
     }
@@ -270,7 +285,7 @@ public class Main {
         rule.findOrphans(width, map);
 
         ArrayList<String> orphans = map.get(width);
-        outputMessage(rule.toString() + " has " + orphans.size() + " orphans of width " + width, 4);
+        outputMessage(rule + " has " + orphans.size() + " orphans of width " + width, 4);
         for(String r: orphans) {
             outputMessage("  " + r, 5);
         }
@@ -346,8 +361,8 @@ public class Main {
     public static void logDataMatrix(FileWriter file, int[] data) {
         try {
             StringBuilder sb = new StringBuilder();
-            for(int i = 0; i < data.length; i++) {
-                sb.append(data[i]);
+            for (int datum : data) {
+                sb.append(datum);
                 sb.append(',');
             }
             sb.setLength(sb.length()-1);

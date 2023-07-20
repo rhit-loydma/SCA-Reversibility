@@ -20,7 +20,7 @@ public class Config {
     }
     public String getType(){
         String input = this.prop.getProperty("type");
-        String[] vals = new String[]{"pattern", "balanced", "surjective", "injective", "GoE", "orphans", "twins"};
+        String[] vals = new String[]{"pattern", "balanced", "surjective", "injective", "GoE", "orphans", "twins", "predecessors"};
         return this.validateParam("type",input, vals);
     }
 
@@ -47,23 +47,28 @@ public class Config {
 
     public int getLoggingMode() {
         String input = this.prop.getProperty("logging");
-        if(input.equals("none")) {
-            return 0;
-        } else if(input.equals("matrix")) {
-            if(this.getType().equals("pattern")) {
-                System.out.println("logging can only occur on all rules and not in pattern mode");
+        switch (input) {
+            case "none" -> {
+                return 0;
+            }
+            case "matrix" -> {
+                if (this.getType().equals("pattern")) {
+                    System.out.println("logging can only occur on all rules and not in pattern mode");
+                    System.exit(1);
+                }
+                return 1;
+            }
+            case "list" -> {
+                if (this.getType().equals("pattern")) {
+                    System.out.println("logging can only occur on all rules and not in pattern mode");
+                    System.exit(1);
+                }
+                return 2;
+            }
+            default -> {
+                System.out.println("logging input must be 'none', 'matrix', or 'list'");
                 System.exit(1);
             }
-            return 1;
-        } else if(input.equals("list")) {
-            if(this.getType().equals("pattern")) {
-                System.out.println("logging can only occur on all rules and not in pattern mode");
-                System.exit(1);
-            }
-            return 2;
-        } else {
-            System.out.println("logging input must be 'none', 'matrix', or 'list'");
-            System.exit(1);
         }
         return 0;
     }
