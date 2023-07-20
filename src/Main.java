@@ -17,11 +17,8 @@ public class Main {
         int maxT = 16;
         int maxC = 16;
         String mode = config.getMode();
-        if(mode.equals("expanded")) {
+        if(mode.equals("weaving")) {
             maxT = 256;
-        } else if (mode.equals("expanded2")) {
-            maxT = 256;
-            maxC = 256;
         } else if (mode.equals("original") || mode.equals("totalistic")) {
             maxT = 512;
             maxC = 512;
@@ -73,7 +70,7 @@ public class Main {
                     int output = performComputation(createRule(i, c), w);
                     line[j+1] = output;
                     if(output == 1) {
-                        list.add(j);
+                        list.add(c);
                     }
                 }
                 if(logging== 1) {
@@ -139,11 +136,10 @@ public class Main {
         switch (mode) {
             case "wolfram" -> { return new WolframRule(c,t); }
             case "original" -> { return new OriginalRule(c,t); }
-            case "expanded" -> { return new ExpandedRule(c,t); }
-            case "expanded2" -> { return new ExpandedRule2(c,t); }
+            case "weaving" -> { return new WeavingRule(c,t); }
             case "totalistic" -> { return new TotalisticRule(c,t); }
             case "multicolored" -> { return new MulticoloredRule(c,t); }
-            default -> { return new SimplifiedRule(c,t); }
+            default -> { return new BraceletRule(c,t); }
         }
     }
 

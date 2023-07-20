@@ -1,12 +1,12 @@
-public class ExpandedRule2 extends Rule{
-	public ExpandedRule2(int c, int t) {
+public class WeavingRule extends Rule{
+	public WeavingRule(int c, int t) {
 		super(c, t);
 	}
 
 	@Override
 	public void setRuleCounts() {
 		maxT = 256;
-		maxC = 256;
+		maxC = 16;
 	}
 
 	@Override
@@ -24,10 +24,10 @@ public class ExpandedRule2 extends Rule{
 
 	@Override
 	public void generateRuleMap() {
-		//get 8-bit rule
-		crossing = "0".repeat(8 - crossing.length()) + crossing;
+		//get 4-bit rule
+		crossing = "0".repeat(4 - crossing.length()) + crossing;
 		//fill in pre-determined bits
-		crossing = crossing + "2";
+		crossing = crossing.substring(0,2) + "1" + crossing.substring(2,4) + "1002";
 
 		//get 8-bit rule
 		turning = "0".repeat(8 - turning.length()) + turning;
@@ -40,10 +40,10 @@ public class ExpandedRule2 extends Rule{
 		for(char left: states) {
 			for(char right: states) {
 				//need to get crossing and turning status of each cell
-				int leftC = getCrossingStatus(left);
-				int leftT = getTurningStatus(left);
-				int rightC = getCrossingStatus(right);
-				int rightT = getTurningStatus(right);
+				int leftC = getTopThreadLeft(left);
+				int leftT = getTurningStatusLeft(left);
+				int rightC = getTopThreadRight(right);
+				int rightT = getTurningStatusRight(right);
 				//use those to calculate indexes
 				int crossingIndex = 3 * leftC + rightC;
 				int turningIndex = 3 * leftT + rightT;
@@ -53,13 +53,13 @@ public class ExpandedRule2 extends Rule{
 
 				//check for absent left thread for turning status
 				int l = t;
-				if(left == 'N' || left == 'f' || left == 'l') {
+				if(left == 'N' || left == 'f' || left == 'r') {
 					l = 2;
 				}
 
 				//check for absent right thread for turning status
 				int r = t;
-				if(right == 'N' || right == 'b' || right == 'r') {
+				if(right == 'N' || right == 'b' || right == 'l') {
 					r = 2;
 				}
 
@@ -67,7 +67,7 @@ public class ExpandedRule2 extends Rule{
 				int cs = l*10 + r;
 				c = switch(cs) {
 					case 0, 11 ->  c; //exists, exists
-					case 2, 12 -> 1; //upright, none -> left is on top
+					case 2, 12 -> 1; //exists, none -> left is on top
 					case 20, 21 -> 0; //none, exists -> right is on top
 					case 22 -> 2; //none, none -> no thread is on top
 					default -> 2;
@@ -87,24 +87,39 @@ public class ExpandedRule2 extends Rule{
 	public String getDebugColor(char c) {
 		return switch (c) {
 			case 'B', 'R', 'F', 'L'-> "\u001B[32m"; //green, 2 strands
-			case 'b', 'r', 'f', 'l'-> "\u001B[33m"; //yellow, 1 strand;
+			case 'b', 'r', 'f', 'l'-> "\u001B[33m"; //yellow, 1 strand
 			default -> "\u001B[31m"; //red, no strands
 		};
 	}
 
-	public static int getCrossingStatus(char cell) {
+	public static int getTopThreadLeft(char cell) {
 		return switch (cell) {
-			case 'L', 'F' -> 1;
-			case 'R', 'B' -> 0;
+			case 'R', 'B', 'b' -> 0;
+			case 'F', 'L', 'l' -> 1;
 			default -> 2;
 		};
 	}
 
-
-	public static int getTurningStatus(char cell) {
+	public static int getTopThreadRight(char cell) {
 		return switch (cell) {
-			case 'b', 'F', 'B', 'f' -> 0;
-			case 'r', 'L', 'R', 'l' -> 1;
+			case 'R', 'B', 'r' -> 0;
+			case 'F', 'L', 'f' -> 1;
+			default -> 2;
+		};
+	}
+
+	public static int getTurningStatusLeft(char cell) {
+		return switch (cell) {
+			case 'b', 'F', 'B' -> 0;
+			case 'l', 'L', 'R' -> 1;
+			default -> 2;
+		};
+	}
+
+	public static int getTurningStatusRight(char cell) {
+		return switch (cell) {
+			case 'f', 'F', 'B' -> 0;
+			case 'r', 'L', 'R' -> 1;
 			default -> 2;
 		};
 	}

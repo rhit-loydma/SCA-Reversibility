@@ -1,5 +1,5 @@
-public class SimplifiedRule extends Rule{
-	public SimplifiedRule(int c, int t) {
+public class BraceletRule extends Rule{
+	public BraceletRule(int c, int t) {
 		super(c, t);
 	}
 

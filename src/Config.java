@@ -26,7 +26,7 @@ public class Config {
 
     public String getMode(){
         String input = this.prop.getProperty("mode");
-        String[] vals = new String[]{"expanded", "expanded2", "simplified", "wolfram", "original", "totalistic", "multicolored"};
+        String[] vals = new String[]{"weaving", "bracelet", "wolfram", "original", "totalistic", "multicolored"};
         return this.validateParam("mode",input, vals);
     }
 
