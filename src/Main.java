@@ -31,6 +31,9 @@ public class Main {
         ArrayList<Integer> turning = getRules(config.getTurningRule(), maxT);
 
         int[] line;
+        float[][] heatmap = new float[0][];
+        int turningBits = 0;
+        int crossingBits = 0;
         ArrayList<Integer> list;
         String filename;
         int logging = config.getLoggingMode();
@@ -39,6 +42,12 @@ public class Main {
         for(int w = start; w <= end; w++) {
             outputMessage(w + " " + java.time.LocalTime.now(), 1);
 
+            if(logging==3) {
+                turningBits = (int) (Math.log(maxT) / Math.log(2)) + 1;
+                crossingBits = (int) (Math.log(maxC) / Math.log(2)) + 1;
+                heatmap = new float[turningBits][crossingBits];
+            }
+
             //file setup
             if(logging!= 0){
                 filename = getFilename(w);
@@ -46,7 +55,7 @@ public class Main {
                     makeDirectories(filename);
                     file = new FileWriter(filename);
 
-                    if(logging==1) { //headers for matrix logging
+                    if(logging==1) { //header row  for matrix logging
                         line = new int[crossing.size()+1];
                         line[0] = -1;
                         for(int j = 0; j < crossing.size(); j++) {
@@ -65,6 +74,12 @@ public class Main {
                 line = new int[crossing.size()+1];
                 line[0] =  i;
                 list = new ArrayList<>();
+                int tb = 0;
+                int tc = 0;
+                if(logging==3) {
+                    tb = (int) Integer.toString(i, 2).chars().filter(num -> num == '1').count();
+                    tc = combinations(turningBits - 1, tb);
+                }
                 for(int j = 0; j < crossing.size(); j++) {
                     int c = crossing.get(j);
                     outputMessage("Crossing Rule: " + c, 3);
@@ -73,12 +88,20 @@ public class Main {
                     if(output == 1) {
                         list.add(c);
                     }
+                    if(logging==3) {
+                        int cb = (int) Integer.toString(c, 2).chars().filter(num -> num == '1').count();
+                        float norm = ((float) output) / (tc * combinations(crossingBits - 1, cb));
+                        heatmap[tb][cb] += norm;
+                    }
                 }
                 if(logging== 1) {
                     logDataMatrix(file, line);
                 } else if (logging == 2 && list.size() > 0) {
                     logDataList(file, i, list);
                 }
+            }
+            if(logging==3) {
+                logDataHeatmap(file, heatmap);
             }
 
             //close file
@@ -399,9 +422,39 @@ public class Main {
         }
     }
 
+    public static void logDataHeatmap(FileWriter file, float[][] data) {
+        try {
+            StringBuilder sb = new StringBuilder();
+            for (float[] d: data) {
+                for(float datum: d) {
+                    sb.append(datum);
+                    sb.append(',');
+                }
+                sb.setLength(sb.length()-1);
+                sb.append('\n');
+            }
+            sb.setLength(sb.length()-1);
+            file.write(sb.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void outputMessage(String msg, int level) {
         if(config.getOutputLevel() >= level) {
             System.out.println(msg);
         }
+    }
+
+    public static int combinations(int n, int r) {
+        return (int) (fact(n) / (fact(r) * fact(n-r)));
+    }
+
+    public static long fact(int n) {
+        long i = 1;
+        for(int j = 2; j <= n; j++) {
+            i = i * j;
+        }
+        return i;
     }
 }

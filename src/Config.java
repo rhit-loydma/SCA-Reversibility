@@ -65,6 +65,13 @@ public class Config {
                 }
                 return 2;
             }
+            case "heatmap" -> {
+                if (this.getType().equals("pattern")) {
+                    System.out.println("logging can only occur on all rules and not in pattern mode");
+                    System.exit(1);
+                }
+                return 3;
+            }
             default -> {
                 System.out.println("logging input must be 'none', 'matrix', or 'list'");
                 System.exit(1);
