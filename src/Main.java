@@ -7,16 +7,79 @@ public class Main {
     public static void main(String[] args) {
         config = new Config("config.properties");
 
-        int start = config.getStartWidth();
-        int end = start;
-        if(config.getType().equals("twins") || config.getType().equals("GoE") || config.getType().equals("orphans")) {
-            end = config.getEndWidth();
+        ArrayList<String> models = new ArrayList<>();
+        ArrayList<String> types = new ArrayList<>();
+        ArrayList<String> bcs = new ArrayList<>();
+        ArrayList<Integer> widths = new ArrayList<>();
+
+        String type = config.getType();
+        if(type.equals("configs")) {
+            models.add("bracelet");
+            models.add("weaving");
+            models.add("totalistic");
+            models.add("multicolored");
+
+            types.add("GoEs");
+            types.add("orphans");
+            types.add("twins");
+
+            bcs.add("periodic");
+            bcs.add("null");
+            bcs.add("reflect");
+            bcs.add("copy");
+            bcs.add("previous");
+
+            widths.add(1);
+            widths.add(2);
+            widths.add(3);
+            widths.add(4);
+            widths.add(8);
+        } else if(type.equals("properties")) {
+            models.add("bracelet");
+            models.add("weaving");
+            models.add("totalistic");
+//            models.add("multicolored");
+
+            types.add("balance");
+            types.add("surjective");
+            types.add("injective");
+
+            bcs.add("null");
+            widths.add(1);
+        } else {
+            models.add(config.getMode());
+            types.add(config.getType());
+            bcs.add(config.getBoundaryCondition());
+
+            int start = config.getStartWidth();
+            int end = start;
+            if(config.getType().equals("twins") || config.getType().equals("GoE") || config.getType().equals("orphans")) {
+                end = config.getEndWidth();
+            }
+            for(int i = start; i <= end; i++) {
+                widths.add(i);
+            }
         }
 
+        for(String m: models) {
+            outputMessage("Model " + m + " " + java.time.LocalTime.now(), 1);
+            for(String t: types) {
+                outputMessage("Type " + t + " " + java.time.LocalTime.now(), 1);
+                for(String b: bcs) {
+                    outputMessage("Boundary Condition " + b + " " + java.time.LocalTime.now(), 1);
+                    for(int w: widths) {
+                        outputMessage("Width " + w + " " + java.time.LocalTime.now(), 1);
+                        runExperiment(t, m, w, b);
+                    }
+                }
+            }
+        }
+    }
+
+    public static void runExperiment(String type, String model, int width, String bc) {
         int maxT = 16;
         int maxC = 16;
-        String mode = config.getMode();
-        switch (mode) {
+        switch (model) {
             case "weaving" -> maxT = 256;
             case "original", "totalistic" -> {
                 maxT = 512;
@@ -39,78 +102,74 @@ public class Main {
         int logging = config.getLoggingMode();
         FileWriter file = null;
 
-        for(int w = start; w <= end; w++) {
-            outputMessage(w + " " + java.time.LocalTime.now(), 1);
+        if(logging==3) {
+            turningBits = (int) (Math.log(maxT) / Math.log(2)) + 1;
+            crossingBits = (int) (Math.log(maxC) / Math.log(2)) + 1;
+            heatmap = new float[turningBits][crossingBits];
+        }
 
-            if(logging==3) {
-                turningBits = (int) (Math.log(maxT) / Math.log(2)) + 1;
-                crossingBits = (int) (Math.log(maxC) / Math.log(2)) + 1;
-                heatmap = new float[turningBits][crossingBits];
-            }
+        //file setup
+        if(logging!= 0){
+            filename = getFilename(model, type, bc, width);
+            try {
+                makeDirectories(filename);
+                file = new FileWriter(filename);
 
-            //file setup
-            if(logging!= 0){
-                filename = getFilename(w);
-                try {
-                    makeDirectories(filename);
-                    file = new FileWriter(filename);
-
-                    if(logging==1) { //header row  for matrix logging
-                        line = new int[crossing.size()+1];
-                        line[0] = -1;
-                        for(int j = 0; j < crossing.size(); j++) {
-                            line[j+1] = crossing.get(j);
-                        }
-                        logDataMatrix(file,line);
+                if(logging==1) { //header row  for matrix logging
+                    line = new int[crossing.size()+1];
+                    line[0] = -1;
+                    for(int j = 0; j < crossing.size(); j++) {
+                        line[j+1] = crossing.get(j);
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    logDataMatrix(file,line);
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+        }
 
-            //iterate through rules
-            for(int i: turning) {
-                outputMessage("Turning Rule: " + i, 2);
-                line = new int[crossing.size()+1];
-                line[0] =  i;
-                list = new ArrayList<>();
-                int tb = 0;
-                int tc = 0;
+        //iterate through rules
+        for(int i: turning) {
+            outputMessage("Turning Rule: " + i, 2);
+            line = new int[crossing.size()+1];
+            line[0] =  i;
+            list = new ArrayList<>();
+            int tb = 0;
+            int tc = 0;
+            if(logging==3) {
+                tb = (int) Integer.toString(i, 2).chars().filter(num -> num == '1').count();
+                tc = combinations(turningBits - 1, tb);
+            }
+            for(int j = 0; j < crossing.size(); j++) {
+                int c = crossing.get(j);
+                outputMessage("Crossing Rule: " + c, 3);
+                int output = performComputation(type, createRule(model, i, c), width, bc);
+                line[j+1] = output;
+                if(output == 1) {
+                    list.add(c);
+                }
                 if(logging==3) {
-                    tb = (int) Integer.toString(i, 2).chars().filter(num -> num == '1').count();
-                    tc = combinations(turningBits - 1, tb);
-                }
-                for(int j = 0; j < crossing.size(); j++) {
-                    int c = crossing.get(j);
-                    outputMessage("Crossing Rule: " + c, 3);
-                    int output = performComputation(createRule(i, c), w);
-                    line[j+1] = output;
-                    if(output == 1) {
-                        list.add(c);
-                    }
-                    if(logging==3) {
-                        int cb = (int) Integer.toString(c, 2).chars().filter(num -> num == '1').count();
-                        float norm = ((float) output) / (tc * combinations(crossingBits - 1, cb));
-                        heatmap[tb][cb] += norm;
-                    }
-                }
-                if(logging== 1) {
-                    logDataMatrix(file, line);
-                } else if (logging == 2 && list.size() > 0) {
-                    logDataList(file, i, list);
+                    int cb = (int) Integer.toString(c, 2).chars().filter(num -> num == '1').count();
+                    float norm = ((float) output) / (tc * combinations(crossingBits - 1, cb));
+                    heatmap[tb][cb] += norm;
                 }
             }
-            if(logging==3) {
-                logDataHeatmap(file, heatmap);
+            if(logging== 1) {
+                logDataMatrix(file, line);
+            } else if (logging == 2 && list.size() > 0) {
+                logDataList(file, i, list);
             }
+        }
+        if(logging==3) {
+            logDataHeatmap(file, heatmap);
+        }
 
-            //close file
-            if(logging != 0 && file != null){
-                try {
-                    file.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        //close file
+        if(logging != 0 && file != null){
+            try {
+                file.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -154,8 +213,7 @@ public class Main {
       return rules;
     }
 
-    public static Rule createRule(int t, int c) {
-        String mode = config.getMode();
+    public static Rule createRule(String mode, int t, int c) {
         switch (mode) {
             case "wolfram" -> { return new WolframRule(c,t); }
             case "original" -> { return new OriginalRule(c,t); }
@@ -166,11 +224,10 @@ public class Main {
         }
     }
 
-    public static int performComputation(Rule rule, int width) {
+    public static int performComputation(String type, Rule rule, int width, String bc) {
         outputMessage("\n"+rule.toDebugString(), 4);
-        String bc = config.getBoundaryCondition();
         boolean parity = config.getParity();
-        switch (config.getType()) {
+        switch (type) {
             case ("pattern") -> {
                 char[] start = config.getPatternString();
                 int height = config.getPatternHeight();
@@ -342,34 +399,32 @@ public class Main {
         }
     }
 
-    public static String getFilename(int width) {
+    public static String getFilename(String model, String type, String bc, int width) {
         String filename = "data/";
 
-        String type = config.getType();
         boolean logParity = false;
         switch (type) {
             case "injective", "surjective", "balance" -> {
-                filename += "Properties/";
-                filename += config.getMode() + "/" + type;
+                filename += "properties/";
+                filename += model + "/" + type;
             }
             case "twins" -> {
-                filename += config.getType() + "/";
-                filename += config.getMode() + "/";
-                filename += config.getBoundaryCondition() + "/";
+                filename += type + "/";
+                filename += model + "/";
+                filename += bc + "/";
                 filename += width + "_" + config.getCountingMethod();
                 logParity = true;
             }
             case "GoE", "orphans" -> {
-                filename += config.getType() + "/";
-                filename += config.getMode() + "/";
-                filename += config.getBoundaryCondition() + "/";
+                filename += type + "/";
+                filename += model + "/";
+                filename += bc + "/";
                 filename += width;
                 logParity = true;
             }
             default -> { return ""; }
         }
 
-        String bc = config.getBoundaryCondition();
         if(logParity && (bc.equals("reflect") || bc.equals("previous") || bc.equals("copy"))) {
             filename += "_" + config.getParity();
         }
