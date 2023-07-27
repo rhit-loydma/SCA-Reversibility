@@ -35,8 +35,8 @@ public class MulticoloredRule extends Rule{
 	public void generateRuleMap() {
 		crossing = "0".repeat(16 - crossing.length()) + crossing;
 		turning = "0".repeat(16 - turning.length()) + turning;
-		System.out.println(crossing);
-		System.out.println(turning);
+//		System.out.println(crossing);
+//		System.out.println(turning);
 
 		for(char left: states) {
 			for (char right : states) {
@@ -45,18 +45,18 @@ public class MulticoloredRule extends Rule{
 				int lc = getColorStatus(left) * 2 + getCrossingStatus(left);
 				int rt = getColorStatus(right) * 2 + getTurningStatus(right);
 				int rc = getColorStatus(right) * 2 + getCrossingStatus(right);
-				System.out.println("\n" + left + " " + lt + " " + lc);
-				System.out.println(right + " " + rt + " " + rc);
+//				System.out.println("\n" + left + " " + lt + " " + lc);
+//				System.out.println(right + " " + rt + " " + rc);
 
 				//calculate indexes
 				int tIndex = 4 * lt + rt;
 				int cIndex = 4 * lc + rc;
-				System.out.println(cIndex + " " + tIndex);
+//				System.out.println(cIndex + " " + tIndex);
 
 				//get relevant bits
 				int turningBit = turning.charAt(tIndex)-'0';
 				int crossingBit = crossing.charAt(cIndex)-'0';
-				System.out.println(crossingBit + " " + turningBit);
+//				System.out.println(crossingBit + " " + turningBit);
 
 				map.put("" + left + right, getOutput(turningBit, crossingBit, getLeftColor(left), getRightColor(right)));
 			}

@@ -20,7 +20,7 @@ public class Config {
     }
     public String getType(){
         String input = this.prop.getProperty("type");
-        String[] vals = new String[]{"pattern", "balanced", "surjective", "injective", "GoE", "orphans", "twins", "predecessors"};
+        String[] vals = new String[]{"pattern", "balance", "surjective", "injective", "GoE", "orphans", "twins", "predecessors"};
         return this.validateParam("type",input, vals);
     }
 
@@ -77,7 +77,7 @@ public class Config {
         try {
             int input = Integer.parseInt(this.prop.getProperty("turningRule"));
             int max = 15;
-            if(getMode().equals("expanded")) {
+            if(getMode().equals("weaving")) {
                 max = 255;
             } else if(getMode().equals("original") || getMode().equals("totalistic")) {
                 max = 511;

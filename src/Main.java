@@ -157,7 +157,7 @@ public class Main {
                 char[] start = config.getPatternString();
                 return generatePredecessors(rule, start, bc);
             }
-            case ("balanced") -> {
+            case ("balance") -> {
                 return checkBalanced(rule);
             }
             case ("surjective") -> {
@@ -320,18 +320,27 @@ public class Main {
     }
 
     public static String getFilename(int width) {
-        String filename = "data/" + config.getType() + "/";
+        String filename = "data/";
 
         String type = config.getType();
         boolean logParity = false;
         switch (type) {
-            case "injective", "surjective", "balanced" -> filename += config.getMode() + "_" + type;
+            case "injective", "surjective", "balance" -> {
+                filename += "Properties/";
+                filename += config.getMode() + "/" + type;
+            }
             case "twins" -> {
-                filename += config.getMode() + "/" + width + "_" + config.getCountingMethod() + "_" + config.getBoundaryCondition();
+                filename += config.getType() + "/";
+                filename += config.getMode() + "/";
+                filename += config.getBoundaryCondition() + "/";
+                filename += width + "_" + config.getCountingMethod();
                 logParity = true;
             }
-            case "GoE" -> {
-                filename += config.getMode() + "/" + width + "_" + config.getBoundaryCondition();
+            case "GoE", "orphans" -> {
+                filename += config.getType() + "/";
+                filename += config.getMode() + "/";
+                filename += config.getBoundaryCondition() + "/";
+                filename += width;
                 logParity = true;
             }
             default -> { return ""; }

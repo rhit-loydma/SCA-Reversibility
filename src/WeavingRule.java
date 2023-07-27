@@ -26,11 +26,13 @@ public class WeavingRule extends Rule{
 	public void generateRuleMap() {
 		//get 4-bit rule
 		crossing = "0".repeat(4 - crossing.length()) + crossing;
+//		System.out.println(crossing);
 		//fill in pre-determined bits
 		crossing = crossing.substring(0,2) + "1" + crossing.substring(2,4) + "1002";
 
 		//get 8-bit rule
 		turning = "0".repeat(8 - turning.length()) + turning;
+//		System.out.println(turning);
 		//fill in pre-determined bits
 		turning = turning + "2";
 
