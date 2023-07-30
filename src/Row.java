@@ -273,9 +273,9 @@ public class Row {
                 for(Row row: curRow.findPredecessors()) {
                     char[] chars = row.cells;
                     char first = chars[0];
-                    char last = chars[cur.length()-1];
-                    if(rule.getNext(first + second+"") == this.cells[0]
-                        && rule.getNext(secondLast + last + "") == this.cells[this.cells.length-1]) {
+                    char last = chars[chars.length-1];
+                    if(rule.getNext(""+first + second) == this.cells[0]
+                        && rule.getNext(""+secondLast + last) == this.cells[this.cells.length-1]) {
                         set.add(row);
                     }
                 }

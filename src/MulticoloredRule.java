@@ -40,12 +40,13 @@ public class MulticoloredRule extends Rule{
 
 		for(char left: states) {
 			for (char right : states) {
+//				System.out.println("\n" + left + "" + right);
 				//get statuses
-				int lt = getColorStatus(left) * 2 + getTurningStatus(left);
-				int lc = getColorStatus(left) * 2 + getCrossingStatus(left);
-				int rt = getColorStatus(right) * 2 + getTurningStatus(right);
-				int rc = getColorStatus(right) * 2 + getCrossingStatus(right);
-//				System.out.println("\n" + left + " " + lt + " " + lc);
+				int lt = getLeftColor(left) * 2 + getTurningStatus(left);
+				int lc = getLeftColor(left) * 2 + getCrossingStatus(left);
+				int rt = getRightColor(right) * 2 + getTurningStatus(right);
+				int rc = getRightColor(right) * 2 + getCrossingStatus(right);
+//				System.out.println(left + " " + lt + " " + lc);
 //				System.out.println(right + " " + rt + " " + rc);
 
 				//calculate indexes
@@ -85,15 +86,15 @@ public class MulticoloredRule extends Rule{
 
 	public int getLeftColor(char c) {
 		return switch (c) {
-			case 'L', 'R', 'F', 'B', 'l', 'b', 'd', 'w' -> 0;
-			default -> 1;
+			case 'L', 'R', 'F', 'B', 'l', 'b', 'd', 'w' -> 1;
+			default -> 0;
 		};
 	}
 
 	public int getRightColor(char c) {
 		return switch (c) {
-			case 'L', 'R', 'F', 'B', 'r', 'f', 'a', 's' -> 0;
-			default -> 1;
+			case 'L', 'R', 'F', 'B', 'r', 'f', 'a', 's' -> 1;
+			default -> 0;
 		};
 	}
 

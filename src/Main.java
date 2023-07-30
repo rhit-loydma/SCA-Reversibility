@@ -29,16 +29,15 @@ public class Main {
             bcs.add("copy");
             bcs.add("previous");
 
-            widths.add(1);
             widths.add(2);
             widths.add(3);
             widths.add(4);
-            widths.add(8);
+            widths.add(5);
         } else if(type.equals("properties")) {
             models.add("bracelet");
             models.add("weaving");
             models.add("totalistic");
-//            models.add("multicolored");
+            models.add("multicolored");
 
             types.add("balance");
             types.add("surjective");
@@ -248,13 +247,13 @@ public class Main {
             }
             case ("twins") -> {
                 int method = config.getCountingMethod();
-                return findTwins(rule, width, bc, parity, method);
+                return findTwins(rule, width, bc, method);
             }
             case ("orphans") -> {
                 return findOrphans(rule, width);
             }
             default -> {
-                return findGoEs(rule, width, bc, parity);
+                return findGoEs(rule, width, bc);
             }
         }
     }
@@ -312,12 +311,13 @@ public class Main {
         return 0;
     }
 
-    public static int findTwins(Rule rule, int width, String boundaryCondition, boolean parity, int method) {
+    public static int findTwins(Rule rule, int width, String boundaryCondition, int method) {
         Container<String> configs = new Container<>();
         generateStrings(rule.states, width, "", configs);
         double val = 0;
         for(String s: configs.items) {
-            Row r = new Row(s.toCharArray(), rule, parity, boundaryCondition);
+            System.out.println(s);
+            Row r = new Row(s.toCharArray(), rule, false, boundaryCondition);
 //            HashSet<Row> twins = r.findTwins();
 //            if(twins.size() == 1) {
 //                outputMessage(r.toString() + "has no twins under " + rule.toString(), 4);
@@ -333,13 +333,13 @@ public class Main {
         return (int) val;
     }
 
-    public static int findGoEs(Rule rule, int width, String boundaryCondition, boolean parity) {
+    public static int findGoEs(Rule rule, int width, String boundaryCondition) {
         Container<String> configs = new Container<>();
         generateStrings(rule.states, width, "", configs);
         ArrayList<Row> goes = new ArrayList<>();
         ArrayList<Row> nonGoes = new ArrayList<>();
         for(String s: configs.items) {
-            Row r = new Row(s.toCharArray(), rule, parity, boundaryCondition);
+            Row r = new Row(s.toCharArray(), rule, false, boundaryCondition);
             if(r.findPredecessors().isEmpty()) {
                 goes.add(r);
             } else {
