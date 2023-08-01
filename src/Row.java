@@ -249,8 +249,8 @@ public class Row {
                     leftBoundary = getReflectedCell(second);
                     rightBoundary = getReflectedCell(secondLast);
                 } else {
-                    leftBoundary = first;
-                    rightBoundary = last;
+                    leftBoundary = second;
+                    rightBoundary = secondLast;
                 }
                 if (first == leftBoundary && last == rightBoundary) {
                     set.add(new Row(cur.substring(1, cur.length() - 1).toCharArray(), this.rule, true, this.bc));

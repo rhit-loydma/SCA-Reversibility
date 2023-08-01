@@ -69,8 +69,10 @@ public abstract class Rule {
         for (char c : states) {
             counts.put(c, 0);
         }
+        System.out.println(map.toString());
         for (char l : states) {
             for (char r : states) {
+                System.out.println("" + l + r);
                 char state = map.get("" + l + r);
                 counts.put(state, counts.get(state) + 1);
             }
@@ -113,16 +115,7 @@ public abstract class Rule {
                     q.add(pattern+c);
                 }
             } else if(pattern.length() <= stoppingWidth) {
-                boolean check = true;
-                for(ArrayList<String> list : map.values()) {
-                    for(String s: list) {
-                        if(pattern.contains(s)) {
-                            check = false;
-                            break;
-                        }
-                    }
-                }
-                if(check) {
+                if(this.needToCheck(pattern, map)) {
                     Row r = new Row(pattern.toCharArray(), this, false, "null");
                     if(r.findPredecessors().isEmpty()) { //found orphan
                         map.get(pattern.length()).add(pattern);
@@ -135,5 +128,17 @@ public abstract class Rule {
             }
         }
 
+
+    }
+
+    public boolean needToCheck(String pattern, HashMap<Integer, ArrayList<String>> map) {
+        for(ArrayList<String> list : map.values()) {
+            for(String s: list) {
+                if(pattern.endsWith(s)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

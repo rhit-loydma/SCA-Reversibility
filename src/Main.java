@@ -52,7 +52,7 @@ public class Main {
 
             int start = config.getStartWidth();
             int end = start;
-            if(config.getType().equals("twins") || config.getType().equals("GoE") || config.getType().equals("orphans")) {
+            if(config.getType().equals("twins") || config.getType().equals("GoEs") || config.getType().equals("orphans")) {
                 end = config.getEndWidth();
             }
             for(int i = start; i <= end; i++) {
@@ -316,7 +316,7 @@ public class Main {
         generateStrings(rule.states, width, "", configs);
         double val = 0;
         for(String s: configs.items) {
-            System.out.println(s);
+//            System.out.println(s);
             Row r = new Row(s.toCharArray(), rule, false, boundaryCondition);
 //            HashSet<Row> twins = r.findTwins();
 //            if(twins.size() == 1) {
@@ -326,10 +326,11 @@ public class Main {
 //                for(Row t: twins) {
 //                    outputMessage("  " + t.toString(), 5);
 //                }
-//                val++;
+////                val++;
 //            }
             val += r.numTwins(method);
         }
+//        System.out.println(val);
         return (int) val;
     }
 
@@ -413,21 +414,19 @@ public class Main {
                 filename += model + "/";
                 filename += bc + "/";
                 filename += width + "_" + config.getCountingMethod();
-                logParity = true;
             }
-            case "GoE", "orphans" -> {
+            case "GoEs", "orphans" -> {
                 filename += type + "/";
                 filename += model + "/";
                 filename += bc + "/";
                 filename += width;
-                logParity = true;
             }
             default -> { return ""; }
         }
 
-        if(logParity && (bc.equals("reflect") || bc.equals("previous") || bc.equals("copy"))) {
-            filename += "_" + config.getParity();
-        }
+//        if(logParity && (bc.equals("reflect") || bc.equals("previous") || bc.equals("copy"))) {
+//            filename += "_" + config.getParity();
+//        }
 
         filename += ".csv";
         return filename;

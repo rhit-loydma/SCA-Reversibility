@@ -20,7 +20,7 @@ public class Config {
     }
     public String getType(){
         String input = this.prop.getProperty("type");
-        String[] vals = new String[]{"pattern", "balance", "surjective", "injective", "GoE", "orphans", "twins", "predecessors",
+        String[] vals = new String[]{"pattern", "balance", "surjective", "injective", "GoEs", "orphans", "twins", "predecessors",
                 "configs", "properties"};
         return this.validateParam("type",input, vals);
     }

@@ -77,13 +77,6 @@ public class MulticoloredRule extends Rule{
 		};
 	}
 
-	public int getColorStatus(char c) {
-		return switch (c) {
-			case 'W', 'A', 'S', 'D', 'w', 'a', 's', 'd' -> 1;
-			default -> 0;
-		};
-	}
-
 	public int getLeftColor(char c) {
 		return switch (c) {
 			case 'L', 'R', 'F', 'B', 'l', 'b', 'd', 'w' -> 1;
@@ -101,21 +94,21 @@ public class MulticoloredRule extends Rule{
 	public char getOutput(int t, int c, int l, int r) {
 		int state = t * 1000 + c * 100 + l * 10 + r;
 		return switch (state) {
-			case 1100 -> 'L';
-			case 1000 -> 'R';
-			case 100 -> 'F';
-			case 0 -> 'B';
-			case 1101 -> 'l';
-			case 1010-> 'r';
-			case 101 -> 'f';
-			case 10 -> 'b';
-			case 1110 -> 'a';
-			case 1001 -> 'd';
-			case 110-> 'w';
-			case 1 -> 's';
-			case 1111-> 'A';
-			case 1011 -> 'D';
-			case 111 -> 'W';
+			case 1111 -> 'L';
+			case 1011 -> 'R';
+			case 111 -> 'F';
+			case 11 -> 'B';
+			case 1110 -> 'l';
+			case 1001-> 'r';
+			case 110 -> 'f';
+			case 1 -> 'b';
+			case 1101 -> 'a';
+			case 1010 -> 'd';
+			case 101-> 'w';
+			case 10 -> 's';
+			case 1100-> 'A';
+			case 1000 -> 'D';
+			case 100 -> 'W';
 			default -> 'S';
 		};
 	}
@@ -167,7 +160,7 @@ public class MulticoloredRule extends Rule{
 		right.add('W');
 		right.add('D');
 		right.add('A');
-		
+
 		StringBuilder sb = new StringBuilder("\u001B[1;36m" + "  ");
 		for(char c: right) { //header row
 			sb.append(c);
