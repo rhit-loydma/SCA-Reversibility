@@ -1,4 +1,6 @@
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 
 public class SequentCell {
     String a, b;
@@ -64,9 +66,9 @@ public class SequentCell {
         return changed;
     }
 
-    public int getWeight(HashSet<SequentCell> visited) {
+    public int getWeight(Container<SequentCell> visited) {
         if(visited.contains(this)) {
-            return 0;
+            return Integer.MIN_VALUE;
         }
         visited.add(this);
 

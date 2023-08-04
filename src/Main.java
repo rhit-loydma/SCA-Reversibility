@@ -7,71 +7,15 @@ public class Main {
     public static void main(String[] args) {
         config = new Config("config.properties");
 
-        ArrayList<String> models = new ArrayList<>();
-        ArrayList<String> types = new ArrayList<>();
-        ArrayList<String> bcs = new ArrayList<>();
-        ArrayList<Integer> widths = new ArrayList<>();
-
-        String type = config.getType();
-        if(type.equals("configs")) {
-            models.add("bracelet");
-            models.add("weaving");
-            models.add("totalistic");
-            models.add("multicolored");
-
-            types.add("GoEs");
-            types.add("orphans");
-            types.add("twins");
-
-            bcs.add("periodic");
-            bcs.add("null");
-            bcs.add("reflect");
-            bcs.add("copy");
-            bcs.add("previous");
-
-            widths.add(2);
-            widths.add(3);
-            widths.add(4);
-            widths.add(5);
-        } else if(type.equals("properties")) {
-            models.add("bracelet");
-            models.add("weaving");
-            models.add("totalistic");
-            models.add("multicolored");
-
-            types.add("balance");
-            types.add("surjective");
-            types.add("injective");
-
-            bcs.add("null");
-            widths.add(1);
-        } else {
-            models.add(config.getMode());
-            types.add(config.getType());
-            bcs.add(config.getBoundaryCondition());
-
-            int start = config.getStartWidth();
-            int end = start;
-            if(config.getType().equals("twins") || config.getType().equals("GoEs") || config.getType().equals("orphans")) {
-                end = config.getEndWidth();
-            }
-            for(int i = start; i <= end; i++) {
-                widths.add(i);
-            }
+        int start = config.getStartWidth();
+        int end = start;
+        if(config.getType().equals("twins") || config.getType().equals("GoEs") || config.getType().equals("orphans")) {
+            end = config.getEndWidth();
         }
 
-        for(String m: models) {
-            outputMessage("Model " + m + " " + java.time.LocalTime.now(), 1);
-            for(String t: types) {
-                outputMessage("Type " + t + " " + java.time.LocalTime.now(), 1);
-                for(String b: bcs) {
-                    outputMessage("Boundary Condition " + b + " " + java.time.LocalTime.now(), 1);
-                    for(int w: widths) {
-                        outputMessage("Width " + w + " " + java.time.LocalTime.now(), 1);
-                        runExperiment(t, m, w, b);
-                    }
-                }
-            }
+        for(int i = start; i <= end; i++) {
+            outputMessage("Width " + i + " " + java.time.LocalTime.now(), 1);
+            runExperiment(config.getType(), config.getMode(), i, config.getBoundaryCondition());
         }
     }
 
@@ -225,7 +169,6 @@ public class Main {
 
     public static int performComputation(String type, Rule rule, int width, String bc) {
         outputMessage("\n"+rule.toDebugString(), 4);
-        boolean parity = config.getParity();
         switch (type) {
             case ("pattern") -> {
                 char[] start = config.getPatternString();
@@ -316,7 +259,6 @@ public class Main {
         generateStrings(rule.states, width, "", configs);
         double val = 0;
         for(String s: configs.items) {
-//            System.out.println(s);
             Row r = new Row(s.toCharArray(), rule, false, boundaryCondition);
 //            HashSet<Row> twins = r.findTwins();
 //            if(twins.size() == 1) {
@@ -370,6 +312,7 @@ public class Main {
         for(String r: orphans) {
             outputMessage("  " + r, 5);
         }
+
         return orphans.size();
     }
 
@@ -403,7 +346,6 @@ public class Main {
     public static String getFilename(String model, String type, String bc, int width) {
         String filename = "data/";
 
-        boolean logParity = false;
         switch (type) {
             case "injective", "surjective", "balance" -> {
                 filename += "properties/";
@@ -413,23 +355,38 @@ public class Main {
                 filename += type + "/";
                 filename += model + "/";
                 filename += bc + "/";
-                filename += width + "_" + config.getCountingMethod();
+                filename += width + "_" + getCountingMethod();
             }
-            case "GoEs", "orphans" -> {
+            case "GoEs"-> {
                 filename += type + "/";
                 filename += model + "/";
                 filename += bc + "/";
                 filename += width;
             }
-            default -> { return ""; }
+            case "orphans" -> {
+                filename += type + "/";
+                filename += model + "/";
+                filename += width;
+            }
+            default -> {
+                outputMessage("Error in generating filename", 0);
+                return "";
+            }
         }
-
-//        if(logParity && (bc.equals("reflect") || bc.equals("previous") || bc.equals("copy"))) {
-//            filename += "_" + config.getParity();
-//        }
 
         filename += ".csv";
         return filename;
+    }
+
+    public static String getCountingMethod() {
+        switch(config.getCountingMethod()) {
+            case -2 -> {return "aboveStates";}
+            case -1 -> {return "aboveOne";}
+            case 2 -> {return "twins";}
+            case 3 -> {return "triplets";}
+            case 4 -> {return "quadruplets";}
+            default -> {return config.getCountingMethod() + "";}
+        }
     }
 
     public static void makeDirectories(String filename) {

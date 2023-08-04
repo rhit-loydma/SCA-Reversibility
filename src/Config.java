@@ -5,10 +5,6 @@ import java.util.*;
 public class Config {
     Properties prop;
 
-    /**
-     * Class constructor
-     * @param configFile file path of the .properties file
-     */
     public Config(String configFile) {
         try {
             FileReader file = new FileReader(configFile);
@@ -147,18 +143,7 @@ public class Config {
 
     //section: pattern experiment params
     public char[] getPatternString() {
-//        String[] vals = switch (getMode()) {
-//            case ("original") -> new String[]{Rule.SNN + "", Rule.NNN + "", Rule.NSN + "",
-//                    Rule.UNN + "", Rule.UUN + "", Rule.NUN + "",
-//                    Rule.SSR + "", Rule.SSL + ""};
-//            case ("simplified") -> new String[]{"L", "R", "F", "B"};
-//            default -> new String[]{"0", "1"};
-//        };
         String input = this.prop.getProperty("pattern.startingString");
-        char[] cells = input.toCharArray();
-//        for(int i = 0; i < cells.length; i++) {
-//            validateParam("pattern.StartingString cell " + i, ""+cells[i], vals);
-//        }
         return input.toCharArray();
     }
 
@@ -178,19 +163,6 @@ public class Config {
     }
 
     //section: twin, GoE experiment params
-    public boolean getParity() {
-        String input = this.prop.getProperty("parity");
-        if(input.equals("true")) {
-            return true;
-        } else if(input.equals("false")) {
-            return false;
-        } else {
-            System.out.println("logging input must be 'true' or 'false'");
-            System.exit(1);
-        }
-        return false;
-    }
-
     public int getStartWidth() {
         try {
             int input = Integer.parseInt(this.prop.getProperty("startWidth"));
@@ -232,8 +204,8 @@ public class Config {
             return number;
         } catch(NumberFormatException e) {
             switch (input) {
-                case "surjective" -> { return -2; }
-                case "redundant" -> { return -1; }
+                case "aboveStates" -> { return -2; }
+                case "aboveOne" -> { return -1; }
                 default -> {
                     System.out.println("The twins counting method must be 'surjective', 'redundant', or an int greater than 0");
                     System.exit(1);
@@ -243,14 +215,6 @@ public class Config {
         return 0;
     }
 
-    /**
-     * Validates string input against an array of possible values
-     * Stops the program if a bad value is inserted
-     * @param param the parameter being validated
-     * @param input the user input from the .properties file
-     * @param vals the array of "good" values for the parameter
-     * @return the input
-     */
     private String validateParam(String param, String input, String[] vals) {
         for(String v : vals) {
             if(input.equals(v)){

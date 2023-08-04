@@ -21,7 +21,7 @@ public class SequentTable {
 
 	//steps 1,2,3
 	public boolean populateTable() {
-		//step 1: partition neighborhoods base don what states they go into
+		//step 1: partition neighborhoods based on what states they go into
 		HashMap<Character, ArrayList<String>> state2neighborhoods = new HashMap<>();
 		for(char c: rule.states) {
 			state2neighborhoods.put(c, new ArrayList<>());
@@ -73,7 +73,8 @@ public class SequentTable {
 			HashMap<String, SequentCell> row = cells.get(a);
 			for(String b: row.keySet()) {
 				SequentCell cell = cells.get(a).get(b);
-				if(!cell.crossed && cell.getWeight(new HashSet<>()) <= 0) {
+				Container<SequentCell> cont = new Container<>();
+				if(!cell.crossed && cell.getWeight(cont) <= 0) {
 					return false;
 				}
 			}

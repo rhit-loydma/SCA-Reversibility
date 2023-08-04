@@ -104,17 +104,22 @@ public abstract class Rule {
 
     public void findOrphans(int stoppingWidth, HashMap<Integer, ArrayList<String>> map) {
         String pattern;
+        int length = 0;
         Queue<String> q = new LinkedList<>();
-        q.add("");
+        for(char c: this.states) {
+            q.add(""+c);
+        }
         while(!q.isEmpty()) {
-//            System.out.println(q.toString());
-//            System.out.println(map.toString());
             pattern = q.poll();
-            if(pattern.length() == 0) {
-                for(char c: this.states) {
-                    q.add(pattern+c);
-                }
-            } else if(pattern.length() <= stoppingWidth) {
+            if(pattern.length() != length) {
+                length = pattern.length();
+//                System.out.println(length + " " + java.time.LocalTime.now());
+//                for(int i = 0; i <= stoppingWidth; i++) {
+//                    System.out.print(map.get(i).size() + " ");
+//                }
+//                System.out.print("\n");
+            }
+            if(length <= stoppingWidth) {
                 if(this.needToCheck(pattern, map)) {
                     Row r = new Row(pattern.toCharArray(), this, false, "null");
                     if(r.findPredecessors().isEmpty()) { //found orphan

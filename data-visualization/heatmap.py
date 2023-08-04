@@ -1,17 +1,17 @@
 import matplotlib.pyplot as plt
 
-MODEL = "bracelet"
-BC = "null"
-CONFIGURATION_TYPE = "orphans"
+MODEL = "weaving"
+BC = "periodic"
+CONFIGURATION_TYPE = "twins"
 widths = [2, 3, 4]
 
-fig = plt.figure(figsize=(10,5))
+fig = plt.figure(figsize=(12,6))
     
 axs = []         
 
 for i in range(len(widths)):
     w = widths[i]
-    data = open('data/' + CONFIGURATION_TYPE + '/' + MODEL + '/' + BC + '/' + str(w) + '.csv','r').read()
+    data = open('data/' + CONFIGURATION_TYPE + '/' + MODEL + '/' + BC + '/' + str(w) + '_-1.csv','r').read()
     lines = data.split('\n')
 
     collections = []
