@@ -1,15 +1,18 @@
+package Core;
+
 import java.util.*;
+import BoundaryConditions.NullRow;
 
 public abstract class Rule {
 
-    HashMap<String, Character> map;
-    ArrayList<Character> states;
-    int t;
-    int c;
-    int maxT;
-    int maxC;
-    String crossing;
-    String turning;
+    protected HashMap<String, Character> map;
+    protected ArrayList<Character> states;
+    protected int t;
+    protected int c;
+    protected int maxT;
+    protected int maxC;
+    protected String crossing;
+    protected String turning;
 
     public Rule(int c, int t) {
         this.map = new HashMap<>();
@@ -113,15 +116,10 @@ public abstract class Rule {
             pattern = q.poll();
             if(pattern.length() != length) {
                 length = pattern.length();
-//                System.out.println(length + " " + java.time.LocalTime.now());
-//                for(int i = 0; i <= stoppingWidth; i++) {
-//                    System.out.print(map.get(i).size() + " ");
-//                }
-//                System.out.print("\n");
             }
             if(length <= stoppingWidth) {
                 if(this.needToCheck(pattern, map)) {
-                    Row r = new Row(pattern.toCharArray(), this, false, "null");
+                    Row r = new NullRow(pattern.toCharArray(), this, false);
                     if(r.findPredecessors().isEmpty()) { //found orphan
                         map.get(pattern.length()).add(pattern);
                     } else {

@@ -1,4 +1,8 @@
-public class BraceletRule extends Rule{
+package Rules;
+
+import Core.Rule;
+
+public class BraceletRule extends Rule {
 	public BraceletRule(int c, int t) {
 		super(c, t);
 	}

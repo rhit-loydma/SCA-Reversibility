@@ -1,7 +1,7 @@
-import java.lang.reflect.Array;
+package Core;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 
 public class SequentTable {
 	HashMap<String, HashMap<String, SequentCell>> cells;

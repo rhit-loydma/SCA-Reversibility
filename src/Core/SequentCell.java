@@ -1,6 +1,6 @@
-import java.util.Arrays;
+package Core;
+
 import java.util.HashSet;
-import java.util.Objects;
 
 public class SequentCell {
     String a, b;

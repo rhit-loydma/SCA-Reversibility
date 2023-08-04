@@ -1,3 +1,8 @@
+package Core;
+
+import BoundaryConditions.*;
+import Rules.*;
+
 import java.io.*;
 import java.util.*;
 
@@ -23,7 +28,7 @@ public class Main {
         int maxT = 16;
         int maxC = 16;
         switch (model) {
-            case "weaving" -> maxT = 256;
+            case "macrame" -> maxT = 256;
             case "original", "totalistic" -> {
                 maxT = 512;
                 maxC = 512;
@@ -73,7 +78,7 @@ public class Main {
 
         //iterate through rules
         for(int i: turning) {
-            outputMessage("Turning Rule: " + i, 2);
+            outputMessage("Turning Core.Rule: " + i, 2);
             line = new int[crossing.size()+1];
             line[0] =  i;
             list = new ArrayList<>();
@@ -85,7 +90,7 @@ public class Main {
             }
             for(int j = 0; j < crossing.size(); j++) {
                 int c = crossing.get(j);
-                outputMessage("Crossing Rule: " + c, 3);
+                outputMessage("Crossing Core.Rule: " + c, 3);
                 int output = performComputation(type, createRule(model, i, c), width, bc);
                 line[j+1] = output;
                 if(output == 1) {
@@ -158,12 +163,20 @@ public class Main {
 
     public static Rule createRule(String mode, int t, int c) {
         switch (mode) {
-            case "wolfram" -> { return new WolframRule(c,t); }
-            case "original" -> { return new OriginalRule(c,t); }
-            case "weaving" -> { return new WeavingRule(c,t); }
+            case "macrame" -> { return new MacrameRule(c,t); }
             case "totalistic" -> { return new TotalisticRule(c,t); }
             case "multicolored" -> { return new MulticoloredRule(c,t); }
             default -> { return new BraceletRule(c,t); }
+        }
+    }
+
+    public static Row createRow(String bc, char[] cells, Rule rule, boolean parity) {
+        switch (bc) {
+            case "periodic" -> { return new PeriodicRow(cells, rule, parity); }
+            case "reflect" -> { return new ReflectedRow(cells, rule, parity); }
+            case "copy" -> { return new CopiedRow(cells, rule, parity); }
+            case "second-order" -> { return new SecondOrderRow(cells, rule, parity, ' ', ' '); }
+            default -> { return new NullRow(cells, rule, parity); }
         }
     }
 
@@ -204,7 +217,7 @@ public class Main {
     public static int generatePattern(Rule rule, char[] start, int height, String boundaryCondition) {
         StringBuilder sb = new StringBuilder(rule.toString() + "\n");
         StringBuilder sb2 = new StringBuilder();
-        Row r = new Row(start, rule, false, boundaryCondition);
+        Row r = createRow(boundaryCondition, start, rule, false);
         for(int i = 0; i < height; i++) {
             sb.append(r.toString()).append("     ").append(i).append("\n");
             sb2.append(r.toStringBracelet()).append('\n');
@@ -217,9 +230,9 @@ public class Main {
 
     public static int generatePredecessors(Rule rule, char[] start, String boundaryCondition) {
         StringBuilder sb = new StringBuilder(rule.toString() + "\n");
-        Row r = new Row(start, rule, false, boundaryCondition);
+        Row r = createRow(boundaryCondition, start, rule, false);
         HashSet<Row> pred = r.findPredecessors();
-        outputMessage("Row " + r.toString() + " has " + pred.size() + " predecessors under " + rule, 1);
+        outputMessage("Core.Row " + r.toString() + " has " + pred.size() + " predecessors under " + rule, 1);
         for(Row p: pred) {
             sb.append("     ").append(p.toString()).append("\n");
         }
@@ -259,13 +272,13 @@ public class Main {
         generateStrings(rule.states, width, "", configs);
         double val = 0;
         for(String s: configs.items) {
-            Row r = new Row(s.toCharArray(), rule, false, boundaryCondition);
-//            HashSet<Row> twins = r.findTwins();
+            Row r = createRow(boundaryCondition, s.toCharArray(), rule, false);
+//            HashSet<Core.Row> twins = r.findTwins();
 //            if(twins.size() == 1) {
 //                outputMessage(r.toString() + "has no twins under " + rule.toString(), 4);
 //            } else {
 //                outputMessage(r.toString() + "under rule " + rule.toString() + " has " + twins.size() + " twin(s)", 4);
-//                for(Row t: twins) {
+//                for(Core.Row t: twins) {
 //                    outputMessage("  " + t.toString(), 5);
 //                }
 ////                val++;
@@ -282,7 +295,7 @@ public class Main {
         ArrayList<Row> goes = new ArrayList<>();
         ArrayList<Row> nonGoes = new ArrayList<>();
         for(String s: configs.items) {
-            Row r = new Row(s.toCharArray(), rule, false, boundaryCondition);
+            Row r = createRow(boundaryCondition, s.toCharArray(), rule, false);
             if(r.findPredecessors().isEmpty()) {
                 goes.add(r);
             } else {

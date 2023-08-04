@@ -1,5 +1,9 @@
-public class WeavingRule extends Rule{
-	public WeavingRule(int c, int t) {
+package Rules;
+
+import Core.Rule;
+
+public class MacrameRule extends Rule {
+	public MacrameRule(int c, int t) {
 		super(c, t);
 	}
 

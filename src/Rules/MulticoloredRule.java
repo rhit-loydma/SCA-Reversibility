@@ -1,6 +1,10 @@
+package Rules;
+
+import Core.Rule;
+
 import java.util.ArrayList;
 
-public class MulticoloredRule extends Rule{
+public class MulticoloredRule extends Rule {
 	public MulticoloredRule(int c, int t) {
 		super(c, t);
 	}

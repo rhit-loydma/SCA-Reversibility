@@ -1,4 +1,8 @@
-public class TotalisticRule extends Rule{
+package Rules;
+
+import Core.Rule;
+
+public class TotalisticRule extends Rule {
 	public TotalisticRule(int c, int t) {
 		super(c, t);
 	}

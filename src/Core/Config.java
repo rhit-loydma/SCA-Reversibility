@@ -1,3 +1,5 @@
+package Core;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.*;
@@ -16,14 +18,13 @@ public class Config {
     }
     public String getType(){
         String input = this.prop.getProperty("type");
-        String[] vals = new String[]{"pattern", "balance", "surjective", "injective", "GoEs", "orphans", "twins", "predecessors",
-                "configs", "properties"};
+        String[] vals = new String[]{"pattern", "balance", "surjective", "injective", "GoEs", "orphans", "twins", "predecessors"};
         return this.validateParam("type",input, vals);
     }
 
     public String getMode(){
         String input = this.prop.getProperty("mode");
-        String[] vals = new String[]{"weaving", "bracelet", "wolfram", "original", "totalistic", "multicolored"};
+        String[] vals = new String[]{"macrame", "bracelet", "totalistic", "multicolored"};
         return this.validateParam("mode",input, vals);
     }
 
@@ -81,7 +82,7 @@ public class Config {
         try {
             int input = Integer.parseInt(this.prop.getProperty("turningRule"));
             int max = 15;
-            if(getMode().equals("weaving")) {
+            if(getMode().equals("macrame")) {
                 max = 255;
             } else if(getMode().equals("original") || getMode().equals("totalistic")) {
                 max = 511;
@@ -137,7 +138,7 @@ public class Config {
 
     public String getBoundaryCondition(){
         String input = this.prop.getProperty("boundaryCondition");
-        String[] vals = new String[]{"periodic", "reflect", "copy", "previous", "null"};
+        String[] vals = new String[]{"periodic", "reflect", "copy", "second-order", "null"};
         return this.validateParam("boundaryCondition",input, vals);
     }
 
