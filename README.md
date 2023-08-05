@@ -1,4 +1,16 @@
 # SCA-Reversibility
+1. [Running Experiments](#running-experiments)
+    - [Base Options](#base-options)
+    - [Logging and Output](#logging-and-output)
+    - [Patterns and Predecessors](#patterns-and-predecessors)
+    - [Garden of Edens, Orphans, and Twins](#garden-of-edens-orphans-and-twins)
+2. [Data Visualization](#data-visualization)
+3. [Adding New Models](#adding-new-models)
+    - [Rules and States](#rules-and-states)
+    - [Boundary Conditions](#boundary-conditions)
+
+___
+
 ## Running Experiments
 Users can set up experiments by modifying the parameters stored in [config.properties](config.properties). The options for the parameters are described below:
 
@@ -55,7 +67,7 @@ The output level specifes how much information is printed to the console. Each l
 | [int > 1] | Counts when exactly n states map to the same configuration. For example, setting this to 2 would count only when exactly 2 configurations map to the same thing. Setting this to 3 would count the number of triplets. |
 
 ## Data Visualization
-The current data visualization code for this project is stored [here](data-visualization/heatmap.py). There are several parameters that the use can modify to generate heatmaps using the data stored in files from the experiments. This tool will not work with the list logging mode.
+The current data visualization code for this project is stored [here](data-visualization/heatmap.py). There are several parameters that the user can modify to generate heatmaps using the data stored in files from the experiments. This tool will not work with the list logging mode.
 
 | Parameter | Options | Description| 
 |---|---|---|
