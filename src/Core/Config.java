@@ -144,13 +144,13 @@ public class Config {
 
     //section: pattern experiment params
     public char[] getPatternString() {
-        String input = this.prop.getProperty("pattern.startingString");
+        String input = this.prop.getProperty("startingString");
         return input.toCharArray();
     }
 
     public int getPatternHeight() {
         try {
-            int input = Integer.parseInt(this.prop.getProperty("pattern.height"));
+            int input = Integer.parseInt(this.prop.getProperty("height"));
             if (input < 0) {
                 System.out.println("pattern.height ust be greater than 0");
                 System.exit(1);
@@ -195,7 +195,7 @@ public class Config {
     }
 
     public int getCountingMethod() {
-        String input = this.prop.getProperty("twins.countingMethod");
+        String input = this.prop.getProperty("countingMethod");
         try {
             int number = Integer.parseInt(input);
             if (number < 1) {
