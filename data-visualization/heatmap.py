@@ -1,17 +1,17 @@
 import matplotlib.pyplot as plt
 
-MODEL = "weaving"
-BC = "periodic"
-CONFIGURATION_TYPE = "twins"
-widths = [2, 3, 4]
+MODEL = "bracelet"
+BC = "null"
+CONFIGURATION_TYPE = "orphans"
+widths = [1, 2, 3, 4]
 
-fig = plt.figure(figsize=(12,6))
+fig = plt.figure(figsize=(12,3))
     
 axs = []         
 
 for i in range(len(widths)):
     w = widths[i]
-    data = open('data/' + CONFIGURATION_TYPE + '/' + MODEL + '/' + BC + '/' + str(w) + '_-1.csv','r').read()
+    data = open('data/' + CONFIGURATION_TYPE + '/' + MODEL + '/' + BC + '/' + str(w) + '.csv','r').read()
     lines = data.split('\n')
 
     collections = []
@@ -23,7 +23,7 @@ for i in range(len(widths)):
 
     axs.append(fig.add_subplot(1, len(widths), i+1))
     axs[i].imshow(collections, origin='lower', cmap=plt.colormaps['BuPu'], norm="linear")
-    axs[i].set_title('Width = ' + str(w), fontsize=25)
+    axs[i].set_title('Width = ' + str(w), fontsize=20)
 
 fig.tight_layout()
 plt.show()  

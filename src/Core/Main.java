@@ -78,7 +78,7 @@ public class Main {
 
         //iterate through rules
         for(int i: turning) {
-            outputMessage("Turning Core.Rule: " + i, 2);
+            outputMessage("Turning Rule: " + i, 2);
             line = new int[crossing.size()+1];
             line[0] =  i;
             list = new ArrayList<>();
@@ -90,7 +90,7 @@ public class Main {
             }
             for(int j = 0; j < crossing.size(); j++) {
                 int c = crossing.get(j);
-                outputMessage("Crossing Core.Rule: " + c, 3);
+                outputMessage("Crossing Rule: " + c, 3);
                 int output = performComputation(type, createRule(model, i, c), width, bc);
                 line[j+1] = output;
                 if(output == 1) {
@@ -232,7 +232,7 @@ public class Main {
         StringBuilder sb = new StringBuilder(rule.toString() + "\n");
         Row r = createRow(boundaryCondition, start, rule, false);
         HashSet<Row> pred = r.findPredecessors();
-        outputMessage("Core.Row " + r.toString() + " has " + pred.size() + " predecessors under " + rule, 1);
+        outputMessage("Row " + r.toString() + " has " + pred.size() + " predecessors under " + rule, 1);
         for(Row p: pred) {
             sb.append("     ").append(p.toString()).append("\n");
         }
